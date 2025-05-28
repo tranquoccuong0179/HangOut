@@ -47,19 +47,19 @@ try
             c.InjectStylesheet("/assets/css/kkk.css");
         });
     }
-    // using (var scope = app.Services.CreateScope())
-    // {
-    //     try
-    //     {
-    //         var hangOutContextSeed = scope.ServiceProvider.GetRequiredService<HangOutContextSeed>();
-    //         await hangOutContextSeed.InitializeAsync();
-    //     }
-    //     catch (Exception e)
-    //     {
-    //         Log.Error(e, "An error occurred while seeding the database.");
-    //         throw; 
-    //     }
-    // }
+    using (var scope = app.Services.CreateScope())
+    {
+        try
+        {
+            var hangOutContextSeed = scope.ServiceProvider.GetRequiredService<HangOutContextSeed>();
+            await hangOutContextSeed.InitializeAsync();
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, "An error occurred while seeding the database.");
+            throw; 
+        }
+    }
     app.UseMiddleware<GlobalException>();
     app.UseCors(CorsConstant.PolicyName);
     app.UseHttpsRedirection();
