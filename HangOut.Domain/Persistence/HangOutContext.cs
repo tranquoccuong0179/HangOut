@@ -1,4 +1,5 @@
 using System.Reflection;
+using HangOut.Domain.Entities;
 using HangOut.Domain.Entities.Common.Interface;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,17 @@ public class HangOutContext : DbContext
     public HangOutContext(DbContextOptions<HangOutContext> options) : base(options)
     {
     }
+    public DbSet<Account> Account { get; set; }
+    public DbSet<AccountVoucher> AccountVoucher { get; set; }
+    public DbSet<Booking> Booking { get; set; }
+    public DbSet<Business> Business { get; set; }
+    public DbSet<Event> Event { get; set; }
+    public DbSet<Image> Image { get; set; }
+    public DbSet<Plan> Plan { get; set; }
+    public DbSet<PlanItem> PlanItem { get; set; }
+    public DbSet<Review> Review { get; set; }
+    public DbSet<User> User { get; set; }
+    public DbSet<Voucher> Voucher { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
