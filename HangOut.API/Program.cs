@@ -30,6 +30,7 @@ try
     builder.Services.AddDomainServices(builder.Configuration);
     builder.Services.AddRepositoryServices();
     builder.Services.AddServices();
+    builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
     builder.Services.AddJwtValidation(builder.Configuration);
