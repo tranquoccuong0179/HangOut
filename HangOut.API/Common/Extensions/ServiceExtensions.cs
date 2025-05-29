@@ -14,6 +14,8 @@ public static class ServiceExtensions
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddScoped<IAuthenticationService, AuthenticationService>();
+        services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IRedisService, RedisService>();
         return services;
     }
 

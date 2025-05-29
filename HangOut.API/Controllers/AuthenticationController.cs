@@ -27,4 +27,13 @@ public class AuthenticationController : BaseController<AuthenticationController>
         var response = await _authenticationService.LoginAsync(loginRequest);
         return Ok(response);
     }
+    [HttpPost(ApiEndPointConstant.Authentication.Otp)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<LoginResponse>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<string>))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponse<string>))]
+    public async Task<IActionResult> SendOtpRequest([FromBody] SendOtpRequest sendOtpRequest)
+    {
+        var response = await _authenticationService.SendOtpRequest(sendOtpRequest);
+        return Ok(response);
+    }
 }
