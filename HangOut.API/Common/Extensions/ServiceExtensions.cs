@@ -16,6 +16,9 @@ public static class ServiceExtensions
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IRedisService, RedisService>();
+        services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<IUploadService, UploadService>();
+        
         return services;
     }
 

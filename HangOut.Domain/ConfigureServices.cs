@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
+using Supabase;
 
 namespace HangOut.Domain;
 
@@ -19,7 +20,10 @@ public static class ConfigureServices
         }); 
         services.AddScoped<HangOutContextSeed>();
         services.AddRedis(configuration);
+        services.AddSupabase(configuration);
         services.Configure<SmtpSettings>(configuration.GetSection("SmtpSettings"));
+        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+            
         return services;
     }
     public static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration configuration)
@@ -28,6 +32,21 @@ public static class ConfigureServices
         if (redisConnectionString != null)
             services.AddSingleton<IConnectionMultiplexer>(
                 ConnectionMultiplexer.Connect(redisConnectionString));
+        return services;
+    }
+    public static IServiceCollection AddSupabase(this IServiceCollection services, IConfiguration configuration)
+    {
+        var supabaseSettings = configuration.GetSection("SupabaseSettings").Get<SupabaseSettings>();
+        services.AddScoped<Supabase.Client>(_ =>
+            new Supabase.Client(
+                supabaseSettings.SupabaseUrl,
+                supabaseSettings.SupabaseKey,
+                new SupabaseOptions()
+                {
+                    AutoRefreshToken = true,
+                    AutoConnectRealtime = true
+                }
+            ));
         return services;
     }
 }

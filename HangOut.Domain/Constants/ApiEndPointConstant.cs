@@ -12,4 +12,10 @@ public static class ApiEndPointConstant
         public const string Login = AuthenticationEndpoint + "/login";
         public const string Otp = AuthenticationEndpoint + "/otp";
     }
+
+    public static class Account
+    {
+        public const string AccountEndpoint = ApiEndpoint + "/account";
+        public const string Register = AccountEndpoint + "/register";
+    }
 }
