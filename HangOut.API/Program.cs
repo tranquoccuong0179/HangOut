@@ -32,7 +32,7 @@ try
     builder.Services.AddServices();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
-    builder.Services.AddJwtValidation();
+    builder.Services.AddJwtValidation(builder.Configuration);
     builder.Services.AddConfigSwagger();
     builder.Services.AddHttpContextAccessor();
 
