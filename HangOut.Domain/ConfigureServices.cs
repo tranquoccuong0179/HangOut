@@ -23,6 +23,7 @@ public static class ConfigureServices
         services.AddSupabase(configuration);
         services.Configure<SmtpSettings>(configuration.GetSection("SmtpSettings"));
         services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+        services.Configure<SupabaseSettings>(configuration.GetSection("SupabaseSettings"));
             
         return services;
     }

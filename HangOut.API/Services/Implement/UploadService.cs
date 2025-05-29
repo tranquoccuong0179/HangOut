@@ -1,4 +1,6 @@
 using HangOut.API.Services.Interface;
+using HangOut.Domain.Payload.Settings;
+using Microsoft.Extensions.Options;
 
 namespace HangOut.API.Services.Implement;
 
@@ -6,10 +8,12 @@ public class UploadService : IUploadService
 {
     private readonly Supabase.Client _client;
     private readonly ILogger _logger;
-    public UploadService(Supabase.Client client, ILogger logger)
+    private readonly SupabaseSettings _supabaseSettings;
+    public UploadService(Supabase.Client client, ILogger logger, IOptions<SupabaseSettings> supabaseSettings)
     {
         _client = client;
         _logger = logger;
+        _supabaseSettings = supabaseSettings.Value;
     }
     
     public async Task<string> UploadImageAsync(IFormFile file)
@@ -30,10 +34,10 @@ public class UploadService : IUploadService
             var imageGuid = Guid.NewGuid();
             using var memoryStream = new MemoryStream();
             await file.CopyToAsync(memoryStream);
-            await _client.Storage.From("hangout").Upload(
+            await _client.Storage.From(_supabaseSettings.SupabaseBucket).Upload(
                 memoryStream.ToArray(),
-                $"hangout-{imageGuid}.{extension}");
-            var url = _client.Storage.From("hangout").GetPublicUrl($"hangout-{imageGuid}.{extension}");
+                $"{_supabaseSettings.SupabaseBucket}-{imageGuid}.{extension}");
+            var url = _supabaseSettings.SupabaseStorageUrl + $"hangout-{imageGuid}.{extension}";
             return url;
         }
         catch (Exception e)
