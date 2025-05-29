@@ -36,4 +36,14 @@ public class AuthenticationController : BaseController<AuthenticationController>
         var response = await _authenticationService.SendOtpRequest(sendOtpRequest);
         return Ok(response);
     }
+    [HttpPatch(ApiEndPointConstant.Authentication.ForgetPassword)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<string>))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponse<string>))]
+    public async Task<IActionResult> ForgetPasswordAsync([FromBody] ForgotPasswordRequest forgotPasswordRequest)
+    {
+        var response = await _authenticationService.ForgetPasswordAsync(forgotPasswordRequest);
+        return Ok(response);
+    }
+    
 }

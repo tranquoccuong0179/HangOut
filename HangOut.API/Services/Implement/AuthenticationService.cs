@@ -1,6 +1,7 @@
 using HangOut.API.Common.Utils;
 using HangOut.API.Services.Interface;
 using HangOut.Domain.Entities;
+using HangOut.Domain.Enums;
 using HangOut.Domain.Payload.Base;
 using HangOut.Domain.Payload.Request.Authentication;
 using HangOut.Domain.Payload.Response.Authentication;
@@ -67,10 +68,24 @@ public class AuthenticationService : BaseService<AuthenticationService>, IAuthen
             throw new BadHttpRequestException("Mã OTP đã được gửi");
         
         var accounts = await _unitOfWork.GetRepository<Account>().GetListAsync();
-        if (accounts.Any(x => x.Email.Equals(sendOtpRequest.Email)))
-            throw new BadHttpRequestException("Email đã được sử dụng");
-        if (accounts.Any(x => x.Phone.Equals(sendOtpRequest.Phone)))
-            throw new BadHttpRequestException("Số điện thoại đã được sử dụng");
+
+        switch (sendOtpRequest.OtpType)
+        {
+            case EOtpType.Register:
+                if(sendOtpRequest.Phone == null)
+                    throw new BadHttpRequestException("Số điện thoại không được để trống");
+                if (accounts.Any(x => x.Email.Equals(sendOtpRequest.Email)))
+                    throw new BadHttpRequestException("Email đã được sử dụng");
+                if (accounts.Any(x => x.Phone.Equals(sendOtpRequest.Phone)))
+                    throw new BadHttpRequestException("Số điện thoại đã được sử dụng");
+                break;
+            case EOtpType.ForgotPassword:
+                if (!accounts.Any(x => x.Email.Equals(sendOtpRequest.Email)))
+                    throw new BadHttpRequestException("Email không tồn tại");
+                break;
+            default:
+                throw new BadHttpRequestException("Loại mã OTP không hợp lệ");
+        }
         
         var otp = OtpUtil.GenerateOtp();
         
@@ -79,7 +94,7 @@ public class AuthenticationService : BaseService<AuthenticationService>, IAuthen
         {
             ToAddress = sendOtpRequest.Email,
             Body = emailTemplate,
-            Subject = "[HangOut] Xác thực email"
+            Subject = otp + " là mã xác thực của bạn",
         };
         await _emailService.SendEmailAsync(emailMessage);
         
@@ -94,6 +109,36 @@ public class AuthenticationService : BaseService<AuthenticationService>, IAuthen
             Data = null
         };
     }
+
+    public async Task<ApiResponse> ForgetPasswordAsync(ForgotPasswordRequest forgotPasswordRequest)
+    {
+        var account = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(
+            predicate: x => x.Email.Equals(forgotPasswordRequest.Email)
+        );
+        if (account == null)
+            throw new BadHttpRequestException("Email không tồn tại");
+        
+        var key = "otp:" + forgotPasswordRequest.Email;
+        var existingOtp = await _redisService.GetStringAsync(key);
+        if (string.IsNullOrEmpty(existingOtp))
+            throw new BadHttpRequestException("Không tìm thấy mã OTP");
+        if (!existingOtp.Equals(forgotPasswordRequest.Otp))
+            throw new BadHttpRequestException("Mã OTP không chính xác");
+        
+        account.Password = PasswordUtil.HashPassword(forgotPasswordRequest.NewPassword);
+        _unitOfWork.GetRepository<Account>().UpdateAsync(account);
+        
+        var isSuccess = await _unitOfWork.CommitAsync() > 0;
+        if (!isSuccess)
+            throw new Exception("Một lỗi đã xảy ra trong quá trình đặt lại mật khẩu");
+        return new ApiResponse() 
+        {
+            Status = StatusCodes.Status200OK,
+            Message = "Đặt lại mật khẩu thành công",
+            Data = null
+        };
+    }
+
     private string GetTemplate(string email, string otp)
     {
         var templatePath = Path.Combine(_env.WebRootPath, "assets/html", "template.html");

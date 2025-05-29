@@ -10,4 +10,5 @@ public interface IAuthenticationService
     Task<ApiResponse<LoginResponse>> LoginAsync(LoginRequest loginRequest);
     Task<ApiResponse> SendOtpRequest (SendOtpRequest sendOtpRequest);
     
+    Task<ApiResponse> ForgetPasswordAsync(ForgotPasswordRequest forgotPasswordRequest);
 }
