@@ -4,6 +4,7 @@ using HangOut.Domain.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HangOut.Domain.Migrations
 {
     [DbContext(typeof(HangOutContext))]
-    partial class HangOutContextModelSnapshot : ModelSnapshot
+    [Migration("20250530150530_editImageTableConfig_1")]
+    partial class editImageTableConfig_1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -248,10 +251,6 @@ namespace HangOut.Domain.Migrations
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("EntityType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageType")
                         .IsRequired()
@@ -513,15 +512,19 @@ namespace HangOut.Domain.Migrations
 
             modelBuilder.Entity("HangOut.Domain.Entities.Image", b =>
                 {
-                    b.HasOne("HangOut.Domain.Entities.Business", null)
+                    b.HasOne("HangOut.Domain.Entities.Business", "Business")
                         .WithMany("Images")
                         .HasForeignKey("ObjectId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("HangOut.Domain.Entities.Event", null)
+                    b.HasOne("HangOut.Domain.Entities.Event", "Event")
                         .WithMany("Images")
                         .HasForeignKey("ObjectId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Business");
+
+                    b.Navigation("Event");
                 });
 
             modelBuilder.Entity("HangOut.Domain.Entities.Plan", b =>

@@ -10,6 +10,7 @@ public class Image : EntityAuditBase<Guid>
     public EImageType ImageType { get; set; }
     
     public Guid ObjectId { get; set; }
+    public EntityTypeEnum EntityType { get; set; }
     public virtual Business? Business { get; set; }
     public virtual Event? Event { get; set; }
 }

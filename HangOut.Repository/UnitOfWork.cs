@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using HangOut.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace HangOut.Repository;
 
@@ -8,7 +9,7 @@ public class UnitOfWork<TContext> : IUnitOfWork<TContext> where TContext : DbCon
 {
     public TContext Context { get; }
     private Dictionary<Type, object> _repositories;
-
+    private IDbContextTransaction _currentTransaction;
     public UnitOfWork(TContext context)
     {
         Context = context;
@@ -55,6 +56,53 @@ public class UnitOfWork<TContext> : IUnitOfWork<TContext> where TContext : DbCon
             var exceptionMessage = string.Join(Environment.NewLine,
                 validationErrors.Select(error => $"Properties {error.MemberNames} Error: {error.ErrorMessage}"));
             throw new Exception(exceptionMessage);
+        }
+    }
+
+    public async Task BeginTransactionAsync()
+    {
+        if (_currentTransaction == null)
+        {
+            _currentTransaction = await Context.Database.BeginTransactionAsync();
+        }
+    }
+
+    public async Task CommitTransactionAsync()
+    {
+        try
+        {
+            await CommitAsync();
+            await _currentTransaction?.CommitAsync();
+        }
+        catch
+        {
+            await RollbackTransactionAsync();
+            throw;
+        }
+        finally
+        {
+            await DisposeTransactionAsync();
+        }
+    }
+
+    public async Task RollbackTransactionAsync()
+    {
+        try
+        {
+            await _currentTransaction?.RollbackAsync();
+        }
+        finally
+        {
+            await DisposeTransactionAsync();
+        }
+    }
+
+    public async Task DisposeTransactionAsync()
+    {
+        if (_currentTransaction != null)
+        {
+            await _currentTransaction.DisposeAsync();
+            _currentTransaction = null;
         }
     }
 }
