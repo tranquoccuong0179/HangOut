@@ -13,11 +13,13 @@ public static class ServiceExtensions
 {
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
+
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IRedisService, RedisService>();
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IUploadService, UploadService>();
+        services.AddScoped<IBusinessService, BusinessService>();
         
         return services;
     }
