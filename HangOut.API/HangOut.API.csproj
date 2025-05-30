@@ -18,8 +18,4 @@
       <ProjectReference Include="..\HangOut.Repository\HangOut.Repository.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Common\Utils\" />
-    </ItemGroup>
-
 </Project>

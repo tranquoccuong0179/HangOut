@@ -5,7 +5,7 @@ namespace HangOut.Domain.Entities;
 public class User : EntityAuditBase<Guid>
 {
     public string Name { get; set; }
-    public string Avatar { get; set; }
+    public string? Avatar { get; set; }
     public bool Active { get; set; }
     public Guid AccountId { get; set; }
     

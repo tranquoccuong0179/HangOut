@@ -1,4 +1,7 @@
 using System.Text;
+using HangOut.API.Services.Implement;
+using HangOut.API.Services.Interface;
+using HangOut.Domain.Payload.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -10,11 +13,18 @@ public static class ServiceExtensions
 {
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
+        services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IRedisService, RedisService>();
+        services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<IUploadService, UploadService>();
+        
         return services;
     }
 
-    public static IServiceCollection AddJwtValidation(this IServiceCollection services)
+    public static IServiceCollection AddJwtValidation(this IServiceCollection services, IConfiguration configuration)
     {
+        var jwtSettings = configuration.GetSection("JWTSettings").Get<JwtSettings>();
         services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -23,13 +33,13 @@ public static class ServiceExtensions
         {
             options.TokenValidationParameters = new TokenValidationParameters()
             {
-                ValidIssuer = "OrbitMap",
+                ValidIssuer = jwtSettings?.Issuer,
+                ValidAudience = jwtSettings?.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings?.SecurityKey!)),
                 ValidateIssuer = true,
-                ValidateAudience = false,
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey =
-                    new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes("uthianhdaonhon,vanmuonbietemdangthaythenao,emhoi"))
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true
             };
         });
         return services;
