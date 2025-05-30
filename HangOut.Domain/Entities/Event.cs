@@ -12,6 +12,7 @@ public class Event : EntityAuditBase<Guid>
     public string? Description { get; set; }
     public string Latitude { get; set; }
     public string Longitude { get; set; }
+    public string? MainImageUrl { get; set; }
     public Guid BusinessId { get; set; }
     
     public virtual Business Business { get; set; }

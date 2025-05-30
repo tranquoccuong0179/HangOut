@@ -42,6 +42,7 @@ namespace HangOut.Domain.Migrations
                     Address = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     Province = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    MainImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -93,6 +94,7 @@ namespace HangOut.Domain.Migrations
                     Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
                     Latitude = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Longitude = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    MainImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BusinessId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -225,9 +227,9 @@ namespace HangOut.Domain.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsMain = table.Column<bool>(type: "bit", nullable: false),
                     ImageType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ObjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    EntityType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },

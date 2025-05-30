@@ -9,8 +9,11 @@ namespace HangOut.API.Services.Implement
 {
     public class BusinessService : BaseService<BusinessService>, IBusinessService
     {
-        public BusinessService(IUnitOfWork<HangOutContext> unitOfWork, ILogger logger, IHttpContextAccessor httpContextAccessor) : base(unitOfWork, logger, httpContextAccessor)
+        private readonly IUploadService _uploadService;
+        public BusinessService(IUnitOfWork<HangOutContext> unitOfWork, ILogger logger, 
+            IHttpContextAccessor httpContextAccessor, IUploadService uploadService) : base(unitOfWork, logger, httpContextAccessor)
         {
+            _uploadService = uploadService;
         }
 
         public async Task<ApiResponse<string>> CreateBusiness(Guid accountId, CreateBusinessRequest request)
@@ -29,28 +32,31 @@ namespace HangOut.API.Services.Implement
                     Province = request.Province,
                     Name = request.Name,
                     Description = request.Description,
-                    CreatedDate = request.CreatedDate,
-                    LastModifiedDate = null,
-                    AccountId = accountId
+                    AccountId = accountId,
+                    MainImageUrl = request.MainImage != null
+                        ? await _uploadService.UploadImageAsync(request.MainImage) 
+                        : null,
                 };
 
                 await _unitOfWork.GetRepository<Business>().InsertAsync(createBusiness);
 
-                foreach(var image in request.ImageUrl)
+                if (request.Image != null)
                 {
-                    var newImage = new Image
+                    foreach(var image in request.Image)
                     {
-                        Id= Guid.NewGuid(),
-                        Url = image,
-                        CreatedDate= DateTime.Now,
-                        ObjectId = createBusiness.Id,
-                        ImageType = Domain.Enums.EImageType.Business_Image,
-                        LastModifiedDate = null,
-                        IsMain = false,
-                        EntityType = Domain.Enums.EntityTypeEnum.Business
-                    };
+                        var newImage = new Image
+                        {
+                            Id= Guid.NewGuid(),
+                            Url = await _uploadService.UploadImageAsync(image),
+                            CreatedDate= DateTime.Now,
+                            ObjectId = createBusiness.Id,
+                            ImageType = Domain.Enums.EImageType.Business_Image,
+                            LastModifiedDate = null,
+                            EntityType = Domain.Enums.EntityTypeEnum.Business
+                        };
 
-                    await _unitOfWork.GetRepository<Image>().InsertAsync(newImage);
+                        await _unitOfWork.GetRepository<Image>().InsertAsync(newImage);
+                    }
                 }
 
                 await _unitOfWork.CommitAsync();

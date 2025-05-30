@@ -12,7 +12,9 @@ public class Business : EntityAuditBase<Guid>
     public string Address { get; set; }
     public string Province { get; set; }
     public string? Description { get; set; }
+    public string? MainImageUrl { get; set; }
     public Guid AccountId { get; set; }
+    
     
     public virtual Account Account { get; set; }
     public virtual ICollection<Image> Images { get; set; } = new List<Image>();

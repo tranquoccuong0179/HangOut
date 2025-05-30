@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HangOut.Domain.Migrations
 {
     [DbContext(typeof(HangOutContext))]
-    [Migration("20250530145943_editImageTableConfig")]
-    partial class editImageTableConfig
+    [Migration("20250530175443_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -167,6 +167,9 @@ namespace HangOut.Domain.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("MainImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -228,6 +231,9 @@ namespace HangOut.Domain.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("MainImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -249,21 +255,16 @@ namespace HangOut.Domain.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("BusinessId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("EventId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("EntityType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsMain")
-                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastModifiedDate")
                         .HasColumnType("datetime2");
@@ -277,9 +278,7 @@ namespace HangOut.Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BusinessId");
-
-                    b.HasIndex("EventId");
+                    b.HasIndex("ObjectId");
 
                     b.ToTable("Image");
                 });
@@ -522,11 +521,13 @@ namespace HangOut.Domain.Migrations
                 {
                     b.HasOne("HangOut.Domain.Entities.Business", null)
                         .WithMany("Images")
-                        .HasForeignKey("BusinessId");
+                        .HasForeignKey("ObjectId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("HangOut.Domain.Entities.Event", null)
                         .WithMany("Images")
-                        .HasForeignKey("EventId");
+                        .HasForeignKey("ObjectId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("HangOut.Domain.Entities.Plan", b =>
