@@ -11,6 +11,7 @@ namespace HangOut.Domain.Payload.Request.Business
 {
     public class CreateBusinessRequest
     {
+
         [Required(ErrorMessage = "Name is required")]
         public string Name {  get; set; }
 
