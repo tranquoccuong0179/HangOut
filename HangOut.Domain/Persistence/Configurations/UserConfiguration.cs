@@ -13,9 +13,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Name)
             .IsRequired()
             .HasMaxLength(500);
-        
-        builder.Property(u => u.Avatar)
-            .IsRequired();
 
         builder.Property(u => u.Active)
             .IsRequired();

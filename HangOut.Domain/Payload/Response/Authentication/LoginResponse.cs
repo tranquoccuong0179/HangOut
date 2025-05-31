@@ -4,8 +4,11 @@ namespace HangOut.Domain.Payload.Response.Authentication;
 
 public class LoginResponse
 {
-    public Guid AccountId { get; set; }
-    public string Email { get; set; } = string.Empty;
-    public ERoleEnum Role { get; set; }
     public string AccessToken { get; set; } = string.Empty;
+    public Guid AccountId { get; set; }
+    public string Phone { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string? Name { get; set; } = string.Empty;
+    public string? Avatar { get; set; }
+    public ERoleEnum Role { get; set; }
 }
