@@ -37,7 +37,7 @@ public class BusinessConfiguration : IEntityTypeConfiguration<Business>
         
         builder.Property(b => b.Description)
             .HasMaxLength(1000);
-
+        
         builder.HasOne(b => b.Account)
             .WithMany(a => a.Businesses)
             .HasForeignKey(b => b.AccountId)

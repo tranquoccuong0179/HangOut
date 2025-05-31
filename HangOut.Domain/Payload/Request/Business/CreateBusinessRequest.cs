@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace HangOut.Domain.Payload.Request.Business
 {
@@ -33,13 +34,9 @@ namespace HangOut.Domain.Payload.Request.Business
         public string Province {  get; set; }
 
         public string? Description {  get; set; }
-
-        [JsonIgnore(Condition = JsonIgnoreCondition.Always)]        
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
-
-        [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
-        public DateTime? LastModifiedDate { get; set; }
-
-        public List<string> ImageUrl { get; set; }
+        
+        public IFormFile? MainImage { get; set; }
+        
+        public List<IFormFile>? Image { get; set; }
     }
 }
