@@ -10,9 +10,8 @@ namespace HangOut.API.Controllers
     [Route("api/v1/business")]
     public class BusinessController(ILogger _looger, IBusinessService _businessService) : Controller
     {
-        [HttpPost("create-business")]
-        [Authorize(Roles = "BusinessOwner")]
-        public async Task<IActionResult> CreateBusiness([FromBody] CreateBusinessRequest request)
+        [HttpPost("register-business-owner")]
+        public async Task<IActionResult> CreateBusiness([FromForm]CreateBusinessOwnerRequest request)
         {
             try
             {
@@ -20,8 +19,16 @@ namespace HangOut.API.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-                var accountId = UserUtil.GetAccountId(HttpContext);
-                 var response = await _businessService.CreateBusiness(accountId!.Value,request);
+
+                bool isAdmin =false;
+                var role = UserUtil.GetRole(HttpContext);
+              
+                if (role != null)
+                {
+                    isAdmin = true;
+                }
+
+                 var response = await _businessService.CreateBusinessOwner(isAdmin,request);
                 return StatusCode(response.Status, response);
             }
             catch (Exception ex)

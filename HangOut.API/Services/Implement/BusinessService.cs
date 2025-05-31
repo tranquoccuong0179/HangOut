@@ -1,4 +1,5 @@
-﻿using HangOut.API.Services.Interface;
+﻿using HangOut.API.Common.Utils;
+using HangOut.API.Services.Interface;
 using HangOut.Domain.Entities;
 using HangOut.Domain.Payload.Base;
 using HangOut.Domain.Payload.Request.Business;
@@ -16,15 +17,76 @@ namespace HangOut.API.Services.Implement
             _uploadService = uploadService;
         }
 
-        public async Task<ApiResponse<string>> CreateBusiness(Guid accountId, CreateBusinessRequest request)
+        public async Task<ApiResponse<string>> CreateBusinessOwner(bool isAdmin,CreateBusinessOwnerRequest request)
         {
             await _unitOfWork.BeginTransactionAsync();
             try
             {
+                var checkPhone = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Phone.Equals(request.Phone));
+                if (checkPhone != null)
+                {
+                    return new ApiResponse<string>
+                    {
+                       Status = 208,
+                       Message = "Phone already exist",
+                       Data = request.Phone
+                    };
+                }
+
+                var checkEmail = await _unitOfWork.GetRepository<Account>().SingleOrDefaultAsync(predicate: x => x.Email.Equals(request.Email));
+                if (checkEmail != null)
+                {
+                    return new ApiResponse<string>
+                    {
+                        Status = 208,
+                        Message = "Email already exist",
+                        Data = request.Email
+                    };
+                }
+
+                if (isAdmin)
+                {
+                   request.Active = true;
+                   request.AccountActive = true;
+                }
+
+                else
+                {
+                    request.Active = false;
+                    request.AccountActive = false;
+                }
+
+
+                var creaNewAccount = new Account
+                {
+                    Id = Guid.NewGuid(),
+                    Phone = request.Phone,
+                    Email = request.Email,
+                    Active = request.AccountActive,
+                    Password = PasswordUtil.HashPassword(request.Password),
+                    Role  = Domain.Enums.ERoleEnum.BusinessOwner,
+                    CreatedDate = DateTime.Now,
+                    LastModifiedDate = null
+                };
+
+                await _unitOfWork.GetRepository<Account>().InsertAsync(creaNewAccount);
+
+                var newUser = new User
+                {
+                    Name = request.Name,
+                    Active = creaNewAccount.Active,
+                    Avatar = await _uploadService.UploadImageAsync(request.AvatarImage),
+                    AccountId = creaNewAccount.Id,
+                    CreatedDate = creaNewAccount.CreatedDate,
+                    LastModifiedDate = creaNewAccount.LastModifiedDate,
+                    
+                };
+
+                await _unitOfWork.GetRepository<User>().InsertAsync(newUser);
+
                 var createBusiness = new Business
                 {
                     Id = Guid.NewGuid(),
-                    Active = request.Active,
                     Vibe = request.Vibe,
                     Latitude = request.Latitude,
                     Longitude = request.Longitude,
@@ -32,11 +94,13 @@ namespace HangOut.API.Services.Implement
                     Province = request.Province,
                     Name = request.Name,
                     Description = request.Description,
-                    AccountId = accountId,
+                    AccountId = creaNewAccount.Id,
+                    Active = request.Active,
                     MainImageUrl = request.MainImage != null
                         ? await _uploadService.UploadImageAsync(request.MainImage) 
                         : null,
                 };
+           
 
                 await _unitOfWork.GetRepository<Business>().InsertAsync(createBusiness);
 
@@ -56,7 +120,9 @@ namespace HangOut.API.Services.Implement
                         };
 
                         await _unitOfWork.GetRepository<Image>().InsertAsync(newImage);
+                        Console.WriteLine($"Adding Image: ObjectId={newImage.ObjectId}, EntityType={newImage.EntityType}");
                     }
+
                 }
 
                 await _unitOfWork.CommitAsync();

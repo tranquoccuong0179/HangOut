@@ -25,5 +25,19 @@ namespace HangOut.API.Common.Utils
 
             return accountId;
         }
+
+
+        public static string GetRole(HttpContext httpContext)
+        {
+            if (httpContext == null || httpContext.User == null || !httpContext.User.Identity.IsAuthenticated)
+                return null;
+
+            var roleClaim = httpContext.User.FindFirst(ClaimTypes.Role);
+            if (roleClaim == null) {
+
+                return null;
+            }
+            return roleClaim?.Value;
+        }
     }
 }

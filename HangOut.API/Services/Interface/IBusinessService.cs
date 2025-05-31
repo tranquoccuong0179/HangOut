@@ -6,6 +6,6 @@ namespace HangOut.API.Services.Interface
 {
     public interface IBusinessService
     {
-        Task<ApiResponse<string>> CreateBusiness(Guid accountId,CreateBusinessRequest request);
+        Task<ApiResponse<string>> CreateBusinessOwner(bool isAdmin,CreateBusinessOwnerRequest request);
     }
 }
