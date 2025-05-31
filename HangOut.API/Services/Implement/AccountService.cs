@@ -50,18 +50,12 @@ public class AccountService : BaseService<AccountService>, IAccountService
             Active = true,
             Role = ERoleEnum.User,
         };
-        string? avatar = null;
-        if (request.AvatarImage != null)
-        { 
-            avatar = await _uploadService.UploadImageAsync(request.AvatarImage);
-        }
-
         var user = new User()
         {
             Id = Guid.NewGuid(),
             AccountId = account.Id,
             Name = request.Name,
-            Avatar = avatar,
+            Avatar = request.AvatarImage != null ? await _uploadService.UploadImageAsync(request.AvatarImage) : null,
             Active = true
         };
         await _unitOfWork.GetRepository<User>().InsertAsync(user);
@@ -72,11 +66,12 @@ public class AccountService : BaseService<AccountService>, IAccountService
         var registerResponse = new RegisterResponse() 
         {
             AccessToken = JwtUtil.GenerateJwtToken(account, _jwtSettings),
-            AccountId = account.Id.ToString(),
+            AccountId = account.Id,
             Phone = account.Phone,
             Email = account.Email,
             Name = user.Name,
-            Avatar = user.Avatar
+            Avatar = user.Avatar,
+            Role = account.Role
         };
         return new ApiResponse<RegisterResponse>()
         {
