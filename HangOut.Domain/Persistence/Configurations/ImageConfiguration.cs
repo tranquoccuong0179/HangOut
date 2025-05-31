@@ -12,7 +12,6 @@ public class ImageConfiguration : IEntityTypeConfiguration<Image>
         builder.HasKey(i => i.Id);
 
         builder.Property(i => i.Url).IsRequired();
-        builder.Property(i => i.IsMain).IsRequired();
         builder.Property(i => i.ImageType)
             .IsRequired()
             .HasConversion(

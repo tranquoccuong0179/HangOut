@@ -20,7 +20,7 @@ public static class ServiceExtensions
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IUploadService, UploadService>();
         services.AddScoped<IBusinessService, BusinessService>();
-        
+        services.AddScoped<IUserService, UserService>();
         return services;
     }
 
