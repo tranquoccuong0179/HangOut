@@ -46,4 +46,19 @@ public class UploadService : IUploadService
             throw new BadHttpRequestException("Lỗi khi tải lên tệp lên Supabase Storage");
         }
     }
+
+    public async Task<bool> DeleteImageAsync(string imageUrl)
+    {
+        var imageName = imageUrl.Split(_supabaseSettings.SupabaseStorageUrl).Last();
+        try
+        {
+            await _client.Storage.From(_supabaseSettings.SupabaseBucket).Remove(new List<string> { imageName });
+            return true;
+        }
+        catch (Exception e)
+        {
+            _logger.Error("Lỗi khi xóa tệp khỏi Supabase Storage: {Message}", e.Message);
+            return false;
+        }
+    }
 }
