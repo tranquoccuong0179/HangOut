@@ -10,7 +10,8 @@ namespace HangOut.API.Controllers
     [Route("api/v1/business")]
     public class BusinessController(ILogger _looger, IBusinessService _businessService) : Controller
     {
-        [HttpPost("register-business-owner")]
+        [HttpPost("create-business-owner")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateBusiness([FromForm]CreateBusinessOwnerRequest request)
         {
             try
@@ -20,21 +21,28 @@ namespace HangOut.API.Controllers
                     return BadRequest(ModelState);
                 }
 
-                bool isAdmin =false;
-                var role = UserUtil.GetRole(HttpContext);
-              
-                if (role != null)
-                {
-                    isAdmin = true;
-                }
-
-                 var response = await _businessService.CreateBusinessOwner(isAdmin,request);
+                var response = await _businessService.CreateBusinessOwner(request);
                 return StatusCode(response.Status, response);
             }
             catch (Exception ex)
             {
                 _looger.Error("[Create Business API] " + ex.Message, ex.StackTrace);
                 return StatusCode(500, ex.ToString());
+            }
+        }
+
+        [HttpPost("register-business-account")]
+        public async Task<IActionResult> RegisterBusinessOwner([FromForm] RegisterBusinessRequest request)
+        {
+            try
+            {
+                var response = await _businessService.RegisterBusinessOwner(request);
+                return StatusCode(response.Status, response);
+            }
+            catch (Exception ex)
+            {
+                _looger.Error("[Register Business Owner]" + ex.Message, ex.StackTrace);
+                return StatusCode(500,ex.ToString());
             }
         }
     }
