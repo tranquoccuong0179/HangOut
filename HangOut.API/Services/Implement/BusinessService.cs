@@ -23,11 +23,11 @@ namespace HangOut.API.Services.Implement
             _redisService = redisService;
         }
 
-        public async Task<ApiResponse<string>> EditBusiness(EditBusinessRequest request)
+        public async Task<ApiResponse<string>> EditBusiness(Guid businessId,EditBusinessRequest request)
         {
             try
             {
-                var checkUpdate = await _unitOfWork.GetRepository<Business>().SingleOrDefaultAsync(predicate: x => x.Id == request.Id);
+                var checkUpdate = await _unitOfWork.GetRepository<Business>().SingleOrDefaultAsync(predicate: x => x.Id == businessId);
                 if (checkUpdate == null)
                 {
                     return new ApiResponse<string>

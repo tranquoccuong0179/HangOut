@@ -51,8 +51,7 @@ namespace HangOut.API.Controllers
         {
             try
             {
-                request.Id = businessId;
-                var response = await _businessService.EditBusiness(request);
+                var response = await _businessService.EditBusiness(businessId, request);
                 return StatusCode(response.Status, response);
 
             }catch(Exception ex)

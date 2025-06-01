@@ -11,8 +11,6 @@ namespace HangOut.Domain.Payload.Request.Business
 {
     public class EditBusinessRequest
     {
-        [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
-        public Guid Id { get; set; }
         public string? Name { get; set; }
 
         public string? Vibe {  get; set; }
