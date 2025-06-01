@@ -14,4 +14,5 @@ public class Account : EntityAuditBase<Guid>
     public virtual ICollection<User> Users { get; set; } = new List<User>();
     public virtual ICollection<Business> Businesses { get; set; } = new List<Business>();
     public virtual ICollection<AccountVoucher> AccountVouchers { get; set; } = new List<AccountVoucher>();
+    public virtual ICollection<MyFavourite> MyFavourites { get; set; } = new List<MyFavourite>();
 }

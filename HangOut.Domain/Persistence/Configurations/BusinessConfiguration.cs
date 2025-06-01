@@ -42,7 +42,11 @@ public class BusinessConfiguration : IEntityTypeConfiguration<Business>
             .WithMany(a => a.Businesses)
             .HasForeignKey(b => b.AccountId)
             .OnDelete(DeleteBehavior.Restrict);
-
+        
+        builder.HasOne(b => b.Category)
+            .WithMany(c => c.Businesses)
+            .HasForeignKey(b => b.CategoryId)
+            .OnDelete(DeleteBehavior.Restrict);
 
     }
 }
