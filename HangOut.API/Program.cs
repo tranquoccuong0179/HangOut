@@ -54,6 +54,7 @@ try
         {
             var hangOutContextSeed = scope.ServiceProvider.GetRequiredService<HangOutContextSeed>();
             await hangOutContextSeed.InitializeAsync();
+            await hangOutContextSeed.SeedAsync(); 
         }
         catch (Exception e)
         {

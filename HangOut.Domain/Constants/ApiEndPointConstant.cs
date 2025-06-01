@@ -24,5 +24,7 @@ public static class ApiEndPointConstant
     {
         public const string UserEndpoint = ApiEndpoint + "/users";
         public const string Profile = UserEndpoint + "/profile";
+        public const string UserById = UserEndpoint + "/{id}";
+        public const string UserByIdRemove = UserEndpoint + "/{id}/remove";
     }
 }

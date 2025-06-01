@@ -7,6 +7,7 @@ using HangOut.Domain.Payload.Response.User;
 using HangOut.Domain.Persistence;
 using HangOut.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
+using OrbitMap.Domain.Paginate.Interfaces;
 
 namespace HangOut.API.Services.Implement;
 
@@ -17,6 +18,53 @@ public class UserService : BaseService<UserService>, IUserService
         IHttpContextAccessor httpContextAccessor, IUploadService uploadService) : base(unitOfWork, logger, httpContextAccessor)
     {
         _uploadService = uploadService;
+    }
+
+    public async Task<ApiResponse<IPaginate<GetUserProfileResponse>>> GetAllUsersAsync(int page, int size, string? sortBy, bool isAsc)
+    {
+        var users = await _unitOfWork.GetRepository<User>().GetPagingListAsync(
+            selector: x => new GetUserProfileResponse
+            {
+                UserId = x.Id,
+                Name = x.Name,
+                Phone = x.Account.Phone,
+                Email = x.Account.Email,
+                Avatar = x.Avatar,
+                CreatedDate = x.CreatedDate,
+                LastModifiedDate = x.LastModifiedDate
+            },
+            page: page,
+            size: size,
+            sortBy: sortBy,
+            isAsc: isAsc
+        );
+        return new ApiResponse<IPaginate<GetUserProfileResponse>>()
+        {
+            Status = 200,
+            Message = "Lấy danh sách người dùng thành công",
+            Data = users
+        };
+    }
+
+    public async Task<ApiResponse> DeleteUserAsync(Guid userId)
+    {
+        var user = await _unitOfWork.GetRepository<User>().SingleOrDefaultAsync(
+            predicate: x => x.Id.Equals(userId),
+            include: x => x.Include(x => x.Account)
+        );
+        if (user == null)
+            throw new NotFoundException("Không tìm thấy thông tin người dùng");
+        user.Active = false;
+        user.Account.Active = false;
+        _unitOfWork.GetRepository<User>().UpdateAsync(user);
+        var isSuccess = await _unitOfWork.CommitAsync() > 0;
+        if (!isSuccess)
+            throw new BadHttpRequestException("Xóa người dùng thất bại");
+        return new ApiResponse()
+        {
+            Status = StatusCodes.Status200OK,
+            Message = "Xóa người dùng thành công"
+        };
     }
 
     public async Task<ApiResponse<GetUserProfileResponse>> GetUserProfileAsync(Guid? accountId)
@@ -81,6 +129,32 @@ public class UserService : BaseService<UserService>, IUserService
         {
             Status = StatusCodes.Status200OK,
             Message = "Cập nhật thông tin người dùng thành công"
+        };
+    }
+
+    public async Task<ApiResponse<GetUserProfileResponse>> GetUserDetailsAsync(Guid userId)
+    {
+        
+        var user = await _unitOfWork.GetRepository<User>().SingleOrDefaultAsync(
+            selector: x => new GetUserProfileResponse
+            {
+                UserId = x.Id,
+                Name = x.Name,
+                Phone = x.Account.Phone,
+                Email = x.Account.Email,
+                Avatar = x.Avatar,
+                CreatedDate = x.CreatedDate,
+                LastModifiedDate = x.LastModifiedDate
+            },
+            predicate: x => x.Id.Equals(userId)
+        );
+        if (user == null)
+            throw new NotFoundException("Không tìm thấy thông tin người dùng");
+        return new ApiResponse<GetUserProfileResponse>()
+        {
+            Status = StatusCodes.Status200OK,
+            Message = "Lấy thông tin người dùng thành công",
+            Data = user
         };
     }
 }
