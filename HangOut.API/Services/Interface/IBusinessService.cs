@@ -9,6 +9,6 @@ namespace HangOut.API.Services.Interface
     {
         Task<ApiResponse<string>> CreateBusinessOwner(CreateBusinessOwnerRequest request);
         Task<ApiResponse<string>> RegisterBusinessOwner(RegisterBusinessRequest request);
-
+        Task<ApiResponse<string>> EditBusiness(EditBusinessRequest request);
     }
 }

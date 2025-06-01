@@ -45,5 +45,21 @@ namespace HangOut.API.Controllers
                 return StatusCode(500,ex.ToString());
             }
         }
+
+        [HttpPatch("edit-business/{businessId}")]
+        public async  Task<IActionResult>EditBusiness(Guid businessId, [FromForm]EditBusinessRequest request)
+        {
+            try
+            {
+                request.Id = businessId;
+                var response = await _businessService.EditBusiness(request);
+                return StatusCode(response.Status, response);
+
+            }catch(Exception ex)
+            {
+                _looger.Error("[Edit Business API] " + ex.Message,ex.StackTrace);
+                return StatusCode(500, ex.ToString());
+            }
+        }
     }
 }
