@@ -16,7 +16,15 @@ public static class ApiEndPointConstant
 
     public static class Account
     {
-        public const string AccountEndpoint = ApiEndpoint + "/account";
+        public const string AccountEndpoint = ApiEndpoint + "/accounts";
         public const string Register = AccountEndpoint + "/register";
+    }
+
+    public static class User
+    {
+        public const string UserEndpoint = ApiEndpoint + "/users";
+        public const string Profile = UserEndpoint + "/profile";
+        public const string UserById = UserEndpoint + "/{id}";
+        public const string UserByIdRemove = UserEndpoint + "/{id}/remove";
     }
 }

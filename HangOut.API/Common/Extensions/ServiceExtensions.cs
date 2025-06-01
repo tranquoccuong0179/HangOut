@@ -24,7 +24,9 @@ public static class ServiceExtensions
         services.AddScoped<IUploadService, UploadService>();
         services.AddScoped<IBusinessService, BusinessService>();
         services.AddScoped<IVoucherService, VoucherService>();
-        
+
+        services.AddScoped<IUserService, UserService>();
+
         return services;
     }
 

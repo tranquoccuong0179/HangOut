@@ -8,6 +8,7 @@ using HangOut.Domain.Payload.Response.Authentication;
 using HangOut.Domain.Payload.Settings;
 using HangOut.Domain.Persistence;
 using HangOut.Repository.Interface;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 using IAuthenticationService = HangOut.API.Services.Interface.IAuthenticationService;
@@ -47,8 +48,19 @@ public class AuthenticationService : BaseService<AuthenticationService>, IAuthen
             Email = account.Email,
             AccountId = account.Id,
             AccessToken = JwtUtil.GenerateJwtToken(account, _jwtSettings),
-            Role = account.Role
+            Role = account.Role,
+            Phone = account.Phone,
         };
+        if (account.Role == ERoleEnum.User)
+        {
+            var user = await _unitOfWork.GetRepository<User>().SingleOrDefaultAsync(
+                predicate: x => x.AccountId == account.Id
+            );
+            if (user == null)
+                throw new BadHttpRequestException("Người dùng không tồn tại");
+            loginResponse.Name = user.Name;
+            loginResponse.Avatar = user.Avatar;
+        }
         return new ApiResponse<LoginResponse>()
         {
             Status = StatusCodes.Status200OK,

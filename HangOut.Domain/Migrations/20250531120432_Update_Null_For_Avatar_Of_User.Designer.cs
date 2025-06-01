@@ -4,6 +4,7 @@ using HangOut.Domain.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HangOut.Domain.Migrations
 {
     [DbContext(typeof(HangOutContext))]
-    partial class HangOutContextModelSnapshot : ModelSnapshot
+    [Migration("20250531120432_Update_Null_For_Avatar_Of_User")]
+    partial class Update_Null_For_Avatar_Of_User
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -62,16 +65,22 @@ namespace HangOut.Domain.Migrations
 
             modelBuilder.Entity("HangOut.Domain.Entities.AccountVoucher", b =>
                 {
-                    b.Property<Guid>("AccountId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("VoucherId")
+                    b.Property<Guid>("AccountId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsUsed")
                         .HasColumnType("bit");
 
-                    b.HasKey("AccountId", "VoucherId");
+                    b.Property<Guid>("VoucherId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
 
                     b.HasIndex("VoucherId");
 
