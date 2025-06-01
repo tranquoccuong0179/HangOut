@@ -82,6 +82,8 @@ public class PlanService : BaseService<PlanService>, IPlanService
             predicate: x => x.Id == planId && x.UserId == user.Id,
             include: x => x.Include(p => p.PlanItems)
         );
+        if (plan == null)
+            throw new NotFoundException("Kế hoạch không tồn tại");
         if (plan.PlanItems.Any(x => x.Time == request.Time))
         {
             throw new BadHttpRequestException("Kế hoạch đã có mục tại thời gian này");
@@ -162,7 +164,7 @@ public class PlanService : BaseService<PlanService>, IPlanService
                 Time = x.Time,
                 Business = new GetBusinessPlanItemsResponse()
                 {
-                    Id = x.Id,
+                    Id = x.Business.Id,
                     Name = x.Business.Name,
                     Vibe = x.Business.Vibe,
                     Latitude = x.Business.Latitude,
@@ -229,10 +231,15 @@ public class PlanService : BaseService<PlanService>, IPlanService
         if (user == null)
             throw new NotFoundException("Người dùng không tồn tại");
         var plan = await _unitOfWork.GetRepository<Plan>().SingleOrDefaultAsync(
-            predicate: x => x.Id == planId && x.UserId == user.Id
+            predicate: x => x.Id == planId && x.UserId == user.Id,
+            include: x => x.Include(p => p.PlanItems)
         );
         if (plan == null)
             throw new NotFoundException("Kế hoạch không tồn tại");
+        if (plan.PlanItems.Any())
+        {
+            _unitOfWork.GetRepository<PlanItem>().DeleteRangeAsync(plan.PlanItems);
+        }
         _unitOfWork.GetRepository<Plan>().DeleteAsync(plan);
         var isSuccess = await _unitOfWork.CommitAsync() > 0;
         if (!isSuccess)
