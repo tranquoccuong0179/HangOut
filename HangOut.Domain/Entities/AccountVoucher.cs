@@ -2,7 +2,7 @@ using HangOut.Domain.Entities.Common;
 
 namespace HangOut.Domain.Entities;
 
-public class AccountVoucher : EntityBase<Guid>
+public class AccountVoucher
 {
     public Guid AccountId { get; set; }
     public Guid VoucherId { get; set; }
