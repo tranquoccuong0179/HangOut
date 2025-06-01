@@ -1,6 +1,9 @@
+﻿using System.Net;
 using System.Text;
+using System.Text.Json;
 using HangOut.API.Services.Implement;
 using HangOut.API.Services.Interface;
+using HangOut.Domain.Payload.Base;
 using HangOut.Domain.Payload.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -20,6 +23,7 @@ public static class ServiceExtensions
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IUploadService, UploadService>();
         services.AddScoped<IBusinessService, BusinessService>();
+        services.AddScoped<IVoucherService, VoucherService>();
         
         return services;
     }
@@ -42,6 +46,39 @@ public static class ServiceExtensions
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true
+            };
+
+            options.Events = new JwtBearerEvents
+            {
+                OnChallenge = context =>
+                {
+                    context.HandleResponse();
+                    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    context.Response.ContentType = "application/json";
+                    var result = JsonSerializer.Serialize(new ApiResponse
+                    {
+                        Status = (int)HttpStatusCode.Unauthorized,
+                        Message = "Token không hợp lệ hoặc đã hết hạn",
+                        Data = null
+                    });
+
+                    return context.Response.WriteAsync(result);
+                },
+                OnForbidden = context =>
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                    context.Response.ContentType = "application/json";
+
+                    var result = JsonSerializer.Serialize(new ApiResponse
+                    {
+                        Status = (int)HttpStatusCode.Forbidden,
+                        Message = "Bạn không có quyền truy cập vào tài nguyên này",
+                        Data = null
+                    });
+
+                    return context.Response.WriteAsync(result);
+                }
+
             };
         });
         return services;

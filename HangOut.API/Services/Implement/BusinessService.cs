@@ -1,6 +1,7 @@
 ﻿using HangOut.API.Common.Utils;
 using HangOut.API.Services.Interface;
 using HangOut.Domain.Entities;
+using HangOut.Domain.Paginate;
 using HangOut.Domain.Payload.Base;
 using HangOut.Domain.Payload.Request.Business;
 using HangOut.Domain.Persistence;
@@ -134,6 +135,12 @@ namespace HangOut.API.Services.Implement
                 throw new Exception(ex.ToString());
             }
         }
+
+        public Task<Paginate<ApiResponse<string>>> GetAllBusiness()
+        {
+            throw new NotImplementedException();
+        }
+
         public  async Task<ApiResponse<string>> RegisterBusinessOwner(RegisterBusinessRequest request)
         {
             await _unitOfWork.BeginTransactionAsync();

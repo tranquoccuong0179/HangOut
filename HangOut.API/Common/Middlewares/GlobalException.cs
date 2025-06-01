@@ -1,6 +1,8 @@
 using System.Net;
+using System.Text.Json;
 using HangOut.API.Common.Exceptions;
 using HangOut.Domain.Payload.Base;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace HangOut.API.Common.Middlewares;
 
@@ -28,12 +30,54 @@ public class GlobalException
         {
             await HandleNotFoundException(context, ex);
         }
+        catch (FormatException ex)
+        {
+           await HandleForbiden(context, ex);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+          await HandleUnauthorized(context, ex);
+        }
         catch (Exception ex)
         {
             await HandleException(context, ex);
         }
     }
+    private static Task HandleForbiden(HttpContext context, FormatException ex)
+    {
+        int statusCode = (int)HttpStatusCode.Forbidden;
 
+        var errorResponse = new ApiResponse
+        {
+            Status = statusCode,
+            Message = "Bạn không có quyền truy cập vào tài nguyên này",
+            Data = ex.Message
+        };
+
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = statusCode;
+
+        var json = JsonSerializer.Serialize(errorResponse);
+        return context.Response.WriteAsync(json);
+    }
+
+    private static Task HandleUnauthorized(HttpContext context, UnauthorizedAccessException ex)
+    {
+        var statusCode = HttpStatusCode.Unauthorized;
+
+        var errorResponse = new ApiResponse
+        {
+            Status = (int)statusCode,
+            Message = "Bạn chưa đăng nhập hoặc không có quyền truy cập",
+            Data = ex.Message
+        };
+
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = (int)statusCode;
+
+        var json = JsonSerializer.Serialize(errorResponse);
+        return context.Response.WriteAsync(json);
+    }
     private static Task HandleNotFoundException(HttpContext context, NotFoundException ex)
     {
         int statusCode = (int)HttpStatusCode.NotFound;

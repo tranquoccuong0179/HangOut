@@ -8,8 +8,8 @@ public class AccountVoucherConfiguration : IEntityTypeConfiguration<AccountVouch
 {
     public void Configure(EntityTypeBuilder<AccountVoucher> builder)
     {
-        builder.HasKey(av => av.Id);
-        
+        builder.HasKey(v => new {AccountId = v.AccountId, VoucherId = v.VoucherId});
+
         builder.Property(av => av.IsUsed)
             .IsRequired();
 

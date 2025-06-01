@@ -11,7 +11,6 @@ public class Voucher : EntityAuditBase<Guid>
     public DateTime ValidTo { get; set; }
     public int Quantity { get; set; }
     public Guid BusinessId { get; set; }
-    
     public virtual Business Business { get; set; }
     public virtual ICollection<AccountVoucher> AccountVouchers { get; set; } = new List<AccountVoucher>();
 }
