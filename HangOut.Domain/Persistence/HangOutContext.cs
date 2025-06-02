@@ -23,6 +23,9 @@ public class HangOutContext : DbContext
     public DbSet<Review> Review { get; set; }
     public DbSet<User> User { get; set; }
     public DbSet<Voucher> Voucher { get; set; }
+    public DbSet<Category> Category { get; set; }
+    public DbSet<MyFavourite> MyFavourite { get; set; }
+    public DbSet<UserFavoriteCategories> UserFavoriteCategories { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

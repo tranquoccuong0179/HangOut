@@ -30,32 +30,18 @@ namespace HangOut.Domain.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Business",
+                name: "Category",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    Active = table.Column<bool>(type: "bit", nullable: false),
-                    Vibe = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Latitude = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Longitude = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
-                    Province = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
-                    MainImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Image = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Business", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Business_Account_AccountId",
-                        column: x => x.AccountId,
-                        principalTable: "Account",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                    table.PrimaryKey("PK_Category", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -64,7 +50,7 @@ namespace HangOut.Domain.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    Avatar = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Avatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -82,56 +68,89 @@ namespace HangOut.Domain.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Event",
+                name: "Business",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Location = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    Vibe = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     Latitude = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Longitude = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    Province = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
                     MainImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BusinessId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OpeningHours = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StartDay = table.Column<int>(type: "int", nullable: true),
+                    EndDay = table.Column<int>(type: "int", nullable: true),
+                    TotalLike = table.Column<int>(type: "int", nullable: false),
+                    AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Event", x => x.Id);
+                    table.PrimaryKey("PK_Business", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Event_Business_BusinessId",
-                        column: x => x.BusinessId,
-                        principalTable: "Business",
+                        name: "FK_Business_Account_AccountId",
+                        column: x => x.AccountId,
+                        principalTable: "Account",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Business_Category_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Category",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Voucher",
+                name: "Plan",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Percent = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
-                    ValidFrom = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ValidTo = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    BusinessId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Voucher", x => x.Id);
+                    table.PrimaryKey("PK_Plan", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Voucher_Business_BusinessId",
-                        column: x => x.BusinessId,
-                        principalTable: "Business",
+                        name: "FK_Plan_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserFavoriteCategories",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserFavoriteCategories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserFavoriteCategories_Category_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Category",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserFavoriteCategories_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -169,24 +188,55 @@ namespace HangOut.Domain.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Plan",
+                name: "Event",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Active = table.Column<bool>(type: "bit", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Active = table.Column<bool>(type: "bit", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    Latitude = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Longitude = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    MainImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BusinessId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Plan", x => x.Id);
+                    table.PrimaryKey("PK_Event", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Plan_User_UserId",
-                        column: x => x.UserId,
-                        principalTable: "User",
+                        name: "FK_Event_Business_BusinessId",
+                        column: x => x.BusinessId,
+                        principalTable: "Business",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MyFavourite",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BusinessId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MyFavourite", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MyFavourite_Account_AccountId",
+                        column: x => x.AccountId,
+                        principalTable: "Account",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MyFavourite_Business_BusinessId",
+                        column: x => x.BusinessId,
+                        principalTable: "Business",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -222,56 +272,27 @@ namespace HangOut.Domain.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Image",
+                name: "Voucher",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ImageType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ObjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    EntityType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Percent = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Active = table.Column<bool>(type: "bit", nullable: false),
+                    ValidFrom = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ValidTo = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    BusinessId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Image", x => x.Id);
+                    table.PrimaryKey("PK_Voucher", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Image_Business_ObjectId",
-                        column: x => x.ObjectId,
+                        name: "FK_Voucher_Business_BusinessId",
+                        column: x => x.BusinessId,
                         principalTable: "Business",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Image_Event_ObjectId",
-                        column: x => x.ObjectId,
-                        principalTable: "Event",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AccountVoucher",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    VoucherId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IsUsed = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AccountVoucher", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AccountVoucher_Account_AccountId",
-                        column: x => x.AccountId,
-                        principalTable: "Account",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_AccountVoucher_Voucher_VoucherId",
-                        column: x => x.VoucherId,
-                        principalTable: "Voucher",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -302,10 +323,59 @@ namespace HangOut.Domain.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_AccountVoucher_AccountId",
-                table: "AccountVoucher",
-                column: "AccountId");
+            migrationBuilder.CreateTable(
+                name: "Image",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ObjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    EntityType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BusinessId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    EventId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Image", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Image_Business_BusinessId",
+                        column: x => x.BusinessId,
+                        principalTable: "Business",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Image_Event_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Event",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AccountVoucher",
+                columns: table => new
+                {
+                    AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    VoucherId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsUsed = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AccountVoucher", x => new { x.AccountId, x.VoucherId });
+                    table.ForeignKey(
+                        name: "FK_AccountVoucher_Account_AccountId",
+                        column: x => x.AccountId,
+                        principalTable: "Account",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_AccountVoucher_Voucher_VoucherId",
+                        column: x => x.VoucherId,
+                        principalTable: "Voucher",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AccountVoucher_VoucherId",
@@ -328,14 +398,34 @@ namespace HangOut.Domain.Migrations
                 column: "AccountId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Business_CategoryId",
+                table: "Business",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Event_BusinessId",
                 table: "Event",
                 column: "BusinessId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Image_ObjectId",
+                name: "IX_Image_BusinessId",
                 table: "Image",
-                column: "ObjectId");
+                column: "BusinessId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Image_EventId",
+                table: "Image",
+                column: "EventId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MyFavourite_AccountId",
+                table: "MyFavourite",
+                column: "AccountId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MyFavourite_BusinessId",
+                table: "MyFavourite",
+                column: "BusinessId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Plan_UserId",
@@ -368,6 +458,16 @@ namespace HangOut.Domain.Migrations
                 column: "AccountId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserFavoriteCategories_CategoryId",
+                table: "UserFavoriteCategories",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserFavoriteCategories_UserId",
+                table: "UserFavoriteCategories",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Voucher_BusinessId",
                 table: "Voucher",
                 column: "BusinessId");
@@ -386,10 +486,16 @@ namespace HangOut.Domain.Migrations
                 name: "Image");
 
             migrationBuilder.DropTable(
+                name: "MyFavourite");
+
+            migrationBuilder.DropTable(
                 name: "PlanItem");
 
             migrationBuilder.DropTable(
                 name: "Review");
+
+            migrationBuilder.DropTable(
+                name: "UserFavoriteCategories");
 
             migrationBuilder.DropTable(
                 name: "Voucher");
@@ -405,6 +511,9 @@ namespace HangOut.Domain.Migrations
 
             migrationBuilder.DropTable(
                 name: "User");
+
+            migrationBuilder.DropTable(
+                name: "Category");
 
             migrationBuilder.DropTable(
                 name: "Account");

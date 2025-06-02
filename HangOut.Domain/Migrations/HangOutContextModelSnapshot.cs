@@ -138,12 +138,18 @@ namespace HangOut.Domain.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("EndDay")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("LastModifiedDate")
                         .HasColumnType("datetime2");
@@ -166,10 +172,19 @@ namespace HangOut.Domain.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<string>("OpeningHours")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Province")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("StartDay")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TotalLike")
+                        .HasColumnType("int");
 
                     b.Property<string>("Vibe")
                         .HasMaxLength(500)
@@ -179,7 +194,35 @@ namespace HangOut.Domain.Migrations
 
                     b.HasIndex("AccountId");
 
+                    b.HasIndex("CategoryId");
+
                     b.ToTable("Business");
+                });
+
+            modelBuilder.Entity("HangOut.Domain.Entities.Category", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Category");
                 });
 
             modelBuilder.Entity("HangOut.Domain.Entities.Event", b =>
@@ -280,6 +323,27 @@ namespace HangOut.Domain.Migrations
                     b.HasIndex("EventId");
 
                     b.ToTable("Image");
+                });
+
+            modelBuilder.Entity("HangOut.Domain.Entities.MyFavourite", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BusinessId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("BusinessId");
+
+                    b.ToTable("MyFavourite");
                 });
 
             modelBuilder.Entity("HangOut.Domain.Entities.Plan", b =>
@@ -413,6 +477,27 @@ namespace HangOut.Domain.Migrations
                     b.ToTable("User");
                 });
 
+            modelBuilder.Entity("HangOut.Domain.Entities.UserFavoriteCategories", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserFavoriteCategories");
+                });
+
             modelBuilder.Entity("HangOut.Domain.Entities.Voucher", b =>
                 {
                     b.Property<Guid>("Id")
@@ -501,7 +586,15 @@ namespace HangOut.Domain.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("HangOut.Domain.Entities.Category", "Category")
+                        .WithMany("Businesses")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Account");
+
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("HangOut.Domain.Entities.Event", b =>
@@ -524,6 +617,25 @@ namespace HangOut.Domain.Migrations
                     b.HasOne("HangOut.Domain.Entities.Event", null)
                         .WithMany("Images")
                         .HasForeignKey("EventId");
+                });
+
+            modelBuilder.Entity("HangOut.Domain.Entities.MyFavourite", b =>
+                {
+                    b.HasOne("HangOut.Domain.Entities.Account", "Account")
+                        .WithMany("MyFavourites")
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("HangOut.Domain.Entities.Business", "Business")
+                        .WithMany("MyFavourites")
+                        .HasForeignKey("BusinessId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("Business");
                 });
 
             modelBuilder.Entity("HangOut.Domain.Entities.Plan", b =>
@@ -586,6 +698,25 @@ namespace HangOut.Domain.Migrations
                     b.Navigation("Account");
                 });
 
+            modelBuilder.Entity("HangOut.Domain.Entities.UserFavoriteCategories", b =>
+                {
+                    b.HasOne("HangOut.Domain.Entities.Category", "Category")
+                        .WithMany("UserFavoriteCategories")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("HangOut.Domain.Entities.User", "User")
+                        .WithMany("UserFavoriteCategories")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("HangOut.Domain.Entities.Voucher", b =>
                 {
                     b.HasOne("HangOut.Domain.Entities.Business", "Business")
@@ -603,6 +734,8 @@ namespace HangOut.Domain.Migrations
 
                     b.Navigation("Businesses");
 
+                    b.Navigation("MyFavourites");
+
                     b.Navigation("Users");
                 });
 
@@ -614,11 +747,20 @@ namespace HangOut.Domain.Migrations
 
                     b.Navigation("Images");
 
+                    b.Navigation("MyFavourites");
+
                     b.Navigation("PlanItems");
 
                     b.Navigation("Reviews");
 
                     b.Navigation("Vouchers");
+                });
+
+            modelBuilder.Entity("HangOut.Domain.Entities.Category", b =>
+                {
+                    b.Navigation("Businesses");
+
+                    b.Navigation("UserFavoriteCategories");
                 });
 
             modelBuilder.Entity("HangOut.Domain.Entities.Event", b =>
@@ -638,6 +780,8 @@ namespace HangOut.Domain.Migrations
                     b.Navigation("Plans");
 
                     b.Navigation("Reviews");
+
+                    b.Navigation("UserFavoriteCategories");
                 });
 
             modelBuilder.Entity("HangOut.Domain.Entities.Voucher", b =>

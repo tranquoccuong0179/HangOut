@@ -7,6 +7,7 @@ using HangOut.Domain.Payload.Request.Business;
 using HangOut.Domain.Persistence;
 using HangOut.Repository.Interface;
 using Microsoft.EntityFrameworkCore.Internal;
+using StackExchange.Redis.Maintenance;
 
 namespace HangOut.API.Services.Implement
 {
@@ -22,6 +23,60 @@ namespace HangOut.API.Services.Implement
             _redisService = redisService;
         }
 
+        public async Task<ApiResponse<string>> EditBusiness(Guid businessId,EditBusinessRequest request)
+        {
+            try
+            {
+                var checkUpdate = await _unitOfWork.GetRepository<Business>().SingleOrDefaultAsync(predicate: x => x.Id == businessId);
+                if (checkUpdate == null)
+                {
+                    return new ApiResponse<string>
+                    {
+                        Status = 404,
+                        Message = "Business not found",
+                        Data = null
+                    };
+                }
+                checkUpdate.Name = request.Name ?? checkUpdate.Name;
+                checkUpdate.Active = checkUpdate.Active;
+                checkUpdate.Vibe = request.Vibe ?? checkUpdate.Vibe;
+                checkUpdate.Latitude = request.Latidue ?? checkUpdate.Latitude;
+                checkUpdate.Longitude = request.Lontidue ?? checkUpdate.Longitude;
+                checkUpdate.Address = request.Address ?? checkUpdate.Address;
+                checkUpdate.Province = request.Province ?? checkUpdate.Province;
+                checkUpdate.Description = request.Description ?? checkUpdate.Description;
+                if (request.MainImage == null)
+                {
+                    checkUpdate.MainImageUrl = checkUpdate.MainImageUrl;
+                }
+                else
+                {
+                    checkUpdate.MainImageUrl = await _uploadService.UploadImageAsync(request.MainImage);
+                }
+
+                checkUpdate.OpeningHours = request.OpeningHours ?? checkUpdate.OpeningHours;
+                checkUpdate.StartDay = request.StartDay ?? checkUpdate.StartDay;
+                checkUpdate.EndDay = request.EndDay ?? checkUpdate.EndDay;
+                checkUpdate.TotalLike = checkUpdate.TotalLike;
+                checkUpdate.CategoryId = request.CategoryId ?? checkUpdate.CategoryId;
+                checkUpdate.CreatedDate = checkUpdate.CreatedDate;
+                checkUpdate.LastModifiedDate = checkUpdate.LastModifiedDate;
+
+                _unitOfWork.GetRepository<Business>().UpdateAsync(checkUpdate);
+                await _unitOfWork.CommitAsync();
+                return new ApiResponse<string>
+                {
+                    Status = 200,
+                    Message = "Edit business success",
+                    Data = null
+                };
+
+            }
+            catch (Exception ex) {
+
+                throw new Exception(ex.ToString());
+            }
+        }
         public async Task<ApiResponse<string>> CreateBusinessOwner(CreateBusinessOwnerRequest request)
         {
             await _unitOfWork.BeginTransactionAsync();
@@ -70,8 +125,7 @@ namespace HangOut.API.Services.Implement
                     Avatar = await _uploadService.UploadImageAsync(request.AvatarImage),
                     AccountId = creaNewAccount.Id,
                     CreatedDate = creaNewAccount.CreatedDate,
-                    LastModifiedDate = creaNewAccount.LastModifiedDate,
-                    
+                    LastModifiedDate = creaNewAccount.LastModifiedDate    
                 };
 
                 await _unitOfWork.GetRepository<User>().InsertAsync(newUser);
@@ -91,6 +145,13 @@ namespace HangOut.API.Services.Implement
                     MainImageUrl = request.MainImage != null
                         ? await _uploadService.UploadImageAsync(request.MainImage) 
                         : null,
+                    OpeningHours = request.OpenningHours,
+                    StartDay = request.StartDay,
+                    EndDay = request.EndDay,
+                    TotalLike = request.TotalLike,
+                    CategoryId = request.CategoryId,
+                    CreatedDate = DateTime.Now,
+                    LastModifiedDate = null
                 };
            
 
@@ -135,12 +196,6 @@ namespace HangOut.API.Services.Implement
                 throw new Exception(ex.ToString());
             }
         }
-
-        public Task<Paginate<ApiResponse<string>>> GetAllBusiness()
-        {
-            throw new NotImplementedException();
-        }
-
         public  async Task<ApiResponse<string>> RegisterBusinessOwner(RegisterBusinessRequest request)
         {
             await _unitOfWork.BeginTransactionAsync();
@@ -219,6 +274,13 @@ namespace HangOut.API.Services.Implement
                     MainImageUrl = request.MainImage != null
                         ? await _uploadService.UploadImageAsync(request.MainImage)
                         : null,
+                    OpeningHours = request.OpenningHours,
+                    StartDay = request.StartDay,
+                    EndDay = request.EndDay,
+                    TotalLike = request.TotalLike,
+                    CategoryId = request.CategoryId,
+                    CreatedDate = DateTime.Now,
+                    LastModifiedDate = null
                 };
 
 

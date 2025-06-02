@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using HangOut.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 
 namespace HangOut.Domain.Payload.Request.Business
@@ -55,9 +56,15 @@ namespace HangOut.Domain.Payload.Request.Business
         public string Province { get; set; }
 
         public string? Description { get; set; }
-
         public IFormFile? MainImage { get; set; }
 
+        [Required(ErrorMessage = "OpenningHours is required")]
+        public string OpenningHours { get; set; }
+
+        public DayOfWeekEnum? StartDay { get; set; }
+        public DayOfWeekEnum? EndDay { get; set; }
+        public int TotalLike { get; set; }
         public List<IFormFile>? Image { get; set; }
+        public Guid CategoryId { get; set; }
     }
 }

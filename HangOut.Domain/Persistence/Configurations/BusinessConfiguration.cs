@@ -1,4 +1,5 @@
 using HangOut.Domain.Entities;
+using HangOut.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -42,7 +43,17 @@ public class BusinessConfiguration : IEntityTypeConfiguration<Business>
             .WithMany(a => a.Businesses)
             .HasForeignKey(b => b.AccountId)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.HasOne(b => b.Category)
+            .WithMany(c => c.Businesses)
+            .HasForeignKey(b => b.CategoryId)
+            .OnDelete(DeleteBehavior.Restrict);
 
+        builder.Property(x => x.StartDay)
+        .HasConversion<string>();
+
+        builder.Property(x => x.EndDay)
+            .HasConversion<string>();
 
     }
 }

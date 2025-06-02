@@ -13,4 +13,5 @@ public class User : EntityAuditBase<Guid>
     public virtual ICollection<Plan> Plans { get; set; } = new List<Plan>();
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+    public virtual ICollection<UserFavoriteCategories> UserFavoriteCategories { get; set; } = new List<UserFavoriteCategories>();
 }

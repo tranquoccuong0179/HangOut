@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using HangOut.Domain.Enums;
 using HangOut.Domain.Payload.Request.Account;
 using Microsoft.AspNetCore.Http;
 
@@ -55,7 +56,13 @@ namespace HangOut.Domain.Payload.Request.Business
 
         public IFormFile? MainImage { get; set; }
 
-        public List<IFormFile>? Image { get; set; }
+        [Required(ErrorMessage = "OpenningHours is required")]
+        public string OpenningHours { get; set; }
 
+        public DayOfWeekEnum? StartDay {  get; set; }
+        public DayOfWeekEnum? EndDay {  get; set; }
+        public int TotalLike {  get; set; }
+        public List<IFormFile>? Image { get; set; }
+        public Guid CategoryId { get; set; }
     }
 }
