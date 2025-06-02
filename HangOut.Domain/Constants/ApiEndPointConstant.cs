@@ -27,4 +27,17 @@ public static class ApiEndPointConstant
         public const string UserById = UserEndpoint + "/{id}";
         public const string UserByIdRemove = UserEndpoint + "/{id}/remove";
     }
+
+    public static class Plan
+    {
+        public const string PlanEndpoint = ApiEndpoint + "/plans";
+        public const string PlanWithId = PlanEndpoint + "/{id}";
+        public const string PlanItemsByPlanId = PlanEndpoint + "/{id}/plan-items";
+    }
+
+    public static class PlanItem
+    {
+        public const string PlanItemEndpoint = ApiEndpoint + "/plan-items";
+        public const string PlanItemWithId = PlanItemEndpoint + "/{id}";
+    }
 }

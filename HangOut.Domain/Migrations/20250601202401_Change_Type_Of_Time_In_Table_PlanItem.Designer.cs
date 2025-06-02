@@ -4,6 +4,7 @@ using HangOut.Domain.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HangOut.Domain.Migrations
 {
     [DbContext(typeof(HangOutContext))]
-    partial class HangOutContextModelSnapshot : ModelSnapshot
+    [Migration("20250601202401_Change_Type_Of_Time_In_Table_PlanItem")]
+    partial class Change_Type_Of_Time_In_Table_PlanItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -148,8 +151,8 @@ namespace HangOut.Domain.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<string>("EndDay")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("EndDay")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("LastModifiedDate")
                         .HasColumnType("datetime2");
@@ -180,8 +183,8 @@ namespace HangOut.Domain.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<string>("StartDay")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("StartDay")
+                        .HasColumnType("int");
 
                     b.Property<int>("TotalLike")
                         .HasColumnType("int");

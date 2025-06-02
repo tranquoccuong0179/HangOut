@@ -4,7 +4,7 @@ namespace HangOut.Domain.Entities;
 
 public class PlanItem : EntityBase<Guid>
 {
-    public string Time { get; set; }
+    public TimeOnly Time { get; set; }
     
     public Guid PlanId { get; set; }
     public Guid BusinessId { get; set; }
