@@ -462,10 +462,7 @@ namespace HangOut.API.Services.Implement
             }
         }
 
-        Task<ApiResponse<Paginate<Domain.Payload.Response.Business.GetAllBusinessResponse>>> IBusinessService.GetAllBusinessResponse(Guid? accountId, int pageNumber, int pageSize, string? category, string? province)
-        {
-            throw new NotImplementedException();
-        }
+
 
         public async Task<ApiResponse<Domain.Payload.Response.Business.GetBusinessDetailResponse>> GetBusinessDetail(Guid businessId)
         {
