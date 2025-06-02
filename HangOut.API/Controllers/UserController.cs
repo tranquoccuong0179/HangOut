@@ -4,6 +4,7 @@ using HangOut.API.Services.Interface;
 using HangOut.Domain.Constants;
 using HangOut.Domain.Enums;
 using HangOut.Domain.Payload.Base;
+using HangOut.Domain.Payload.Request.Category;
 using HangOut.Domain.Payload.Request.User;
 using HangOut.Domain.Payload.Response.User;
 using Microsoft.AspNetCore.Mvc;
@@ -15,9 +16,11 @@ namespace HangOut.API.Controllers;
 public class UserController : BaseController<UserController>
 {
     private readonly IUserService _userService;
-    public UserController(ILogger logger, IUserService userService) : base(logger)
+    private readonly ICategoryService _categoryService;
+    public UserController(ILogger logger, IUserService userService, ICategoryService categoryService) : base(logger)
     {
         _userService = userService;
+        _categoryService = categoryService;
     }
     [CustomAuthorize(ERoleEnum.User)]
     [HttpGet(ApiEndPointConstant.User.Profile)]
@@ -74,6 +77,18 @@ public class UserController : BaseController<UserController>
     {
         var response = await _userService.DeleteUserAsync(id);
         return Ok(response);
+    }
+    [CustomAuthorize(ERoleEnum.User)]
+    [HttpPost(ApiEndPointConstant.User.UserFavoriteCategories)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> CreateUserFavoriteCategory([FromBody] CreateUserFavoriteCategoryRequest request)
+    {
+        var accountId = UserUtil.GetAccountId(HttpContext);
+        var response = await _categoryService.CreateUserFavoriteCategoryAsync(accountId, request);
+        return CreatedAtAction(nameof(CreateUserFavoriteCategory), response);
     }
     
     
