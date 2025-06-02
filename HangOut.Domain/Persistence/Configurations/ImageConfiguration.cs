@@ -22,9 +22,9 @@ public class ImageConfiguration : IEntityTypeConfiguration<Image>
         builder.Property(i => i.EntityType)
             .IsRequired()
             .HasConversion<string>();
-
-        builder.Ignore(i => i.Business);
-        builder.Ignore(i => i.Event);
+        
+        // builder.Ignore(i => i.Business);
+        // builder.Ignore(i => i.Event);
 
     }
 }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HangOut.Domain.Migrations
 {
     [DbContext(typeof(HangOutContext))]
-    [Migration("20250602091406_Change_Type_Of_StartDate_And_EndDate_Of_Business")]
-    partial class Change_Type_Of_StartDate_And_EndDate_Of_Business
+    [Migration("20250602171956_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -292,18 +292,12 @@ namespace HangOut.Domain.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("BusinessId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("EntityType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("EventId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ImageType")
                         .IsRequired()
@@ -321,9 +315,7 @@ namespace HangOut.Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BusinessId");
-
-                    b.HasIndex("EventId");
+                    b.HasIndex("ObjectId");
 
                     b.ToTable("Image");
                 });
@@ -614,11 +606,17 @@ namespace HangOut.Domain.Migrations
                 {
                     b.HasOne("HangOut.Domain.Entities.Business", null)
                         .WithMany("Images")
-                        .HasForeignKey("BusinessId");
+                        .HasForeignKey("ObjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_Image_Business_ObjectId");
 
                     b.HasOne("HangOut.Domain.Entities.Event", null)
                         .WithMany("Images")
-                        .HasForeignKey("EventId");
+                        .HasForeignKey("ObjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_Image_Event_ObjectId");
                 });
 
             modelBuilder.Entity("HangOut.Domain.Entities.MyFavourite", b =>

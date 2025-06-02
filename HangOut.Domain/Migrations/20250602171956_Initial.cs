@@ -82,8 +82,8 @@ namespace HangOut.Domain.Migrations
                     Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
                     MainImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     OpeningHours = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    StartDay = table.Column<int>(type: "int", nullable: true),
-                    EndDay = table.Column<int>(type: "int", nullable: true),
+                    StartDay = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EndDay = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TotalLike = table.Column<int>(type: "int", nullable: false),
                     AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -302,7 +302,7 @@ namespace HangOut.Domain.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Time = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Time = table.Column<TimeOnly>(type: "time", maxLength: 100, nullable: false),
                     PlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     BusinessId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
@@ -332,8 +332,6 @@ namespace HangOut.Domain.Migrations
                     ImageType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ObjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     EntityType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BusinessId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    EventId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -341,15 +339,17 @@ namespace HangOut.Domain.Migrations
                 {
                     table.PrimaryKey("PK_Image", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Image_Business_BusinessId",
-                        column: x => x.BusinessId,
+                        name: "FK_Image_Business_ObjectId",
+                        column: x => x.ObjectId,
                         principalTable: "Business",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Image_Event_EventId",
-                        column: x => x.EventId,
+                        name: "FK_Image_Event_ObjectId",
+                        column: x => x.ObjectId,
                         principalTable: "Event",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -408,14 +408,9 @@ namespace HangOut.Domain.Migrations
                 column: "BusinessId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Image_BusinessId",
+                name: "IX_Image_ObjectId",
                 table: "Image",
-                column: "BusinessId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Image_EventId",
-                table: "Image",
-                column: "EventId");
+                column: "ObjectId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MyFavourite_AccountId",

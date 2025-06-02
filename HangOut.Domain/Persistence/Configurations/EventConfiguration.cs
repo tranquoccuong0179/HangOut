@@ -42,5 +42,12 @@ public class EventConfiguration : IEntityTypeConfiguration<Event>
             .WithMany(b => b.Events)
             .HasForeignKey(e => e.BusinessId)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.HasMany(e => e.Images)
+            .WithOne() // No inverse navigation
+            .HasForeignKey(i => i.ObjectId)
+            .HasPrincipalKey(e => e.Id)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("FK_Image_Event_ObjectId");
     }
 }

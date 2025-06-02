@@ -150,7 +150,13 @@ public class PlanService : BaseService<PlanService>, IPlanService
                         StartDay = pi.Business.StartDay,
                         EndDay = pi.Business.EndDay,
                         CreatedDate = pi.Business.CreatedDate,
-                        LastModifiedDate = pi.Business.LastModifiedDate
+                        LastModifiedDate = pi.Business.LastModifiedDate,
+                        Category = new GetCategoryForPlanResponse()
+                        {
+                            Id = pi.Business.Category.Id,
+                            Name = pi.Business.Category.Name,
+                            Image = pi.Business.Category.Image
+                        }
                     } 
                 }).OrderBy(x => x.Time).ToList()
             },
