@@ -8,7 +8,7 @@ public class UserFavoriteCategoriesConfiguration : IEntityTypeConfiguration<User
 {
     public void Configure(EntityTypeBuilder<UserFavoriteCategories> builder)
     {
-        builder.HasKey(ufc => ufc.Id);
+        builder.HasKey(fc => new {CategoryId = fc.CategoryId, UserId = fc.UserId});
         
         builder.HasOne(ufc => ufc.User)
             .WithMany(u => u.UserFavoriteCategories)
