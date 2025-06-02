@@ -289,18 +289,12 @@ namespace HangOut.Domain.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("BusinessId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("EntityType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("EventId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ImageType")
                         .IsRequired()
@@ -318,9 +312,7 @@ namespace HangOut.Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BusinessId");
-
-                    b.HasIndex("EventId");
+                    b.HasIndex("ObjectId");
 
                     b.ToTable("Image");
                 });
@@ -605,11 +597,17 @@ namespace HangOut.Domain.Migrations
                 {
                     b.HasOne("HangOut.Domain.Entities.Business", null)
                         .WithMany("Images")
-                        .HasForeignKey("BusinessId");
+                        .HasForeignKey("ObjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_Image_Business_ObjectId");
 
                     b.HasOne("HangOut.Domain.Entities.Event", null)
                         .WithMany("Images")
-                        .HasForeignKey("EventId");
+                        .HasForeignKey("ObjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_Image_Event_ObjectId");
                 });
 
             modelBuilder.Entity("HangOut.Domain.Entities.MyFavourite", b =>

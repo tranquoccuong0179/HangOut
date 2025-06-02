@@ -32,4 +32,11 @@ public class GetBusinessPlanItemsForPlanResponse
     public DayOfWeek? EndDay { get; set; }
     public DateTime CreatedDate { get; set; }
     public DateTime? LastModifiedDate { get; set; }
+    public GetCategoryForPlanResponse Category { get; set; } = new();
+}
+public class GetCategoryForPlanResponse()
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string? Image { get; set; }
 }

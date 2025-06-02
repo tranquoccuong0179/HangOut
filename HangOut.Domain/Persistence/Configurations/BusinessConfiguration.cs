@@ -54,6 +54,11 @@ public class BusinessConfiguration : IEntityTypeConfiguration<Business>
 
         builder.Property(x => x.EndDay)
             .HasConversion<string>();
-
+        builder.HasMany(b => b.Images)
+            .WithOne() // No inverse navigation
+            .HasForeignKey(i => i.ObjectId)
+            .HasPrincipalKey(b => b.Id)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("FK_Image_Business_ObjectId");
     }
 }

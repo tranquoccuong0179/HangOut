@@ -16,6 +16,6 @@ public class Event : EntityAuditBase<Guid>
     public Guid BusinessId { get; set; }
     
     public virtual Business Business { get; set; }
-    public ICollection<Image> Images { get; set; } = new List<Image>();
+    public ICollection<Image>? Images { get; set; } = new List<Image>();
     
 }
