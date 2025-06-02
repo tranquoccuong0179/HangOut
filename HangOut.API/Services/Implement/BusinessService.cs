@@ -1,11 +1,15 @@
-﻿using HangOut.API.Common.Utils;
+﻿using System.Linq.Expressions;
+using HangOut.API.Common.Utils;
 using HangOut.API.Services.Interface;
 using HangOut.Domain.Entities;
 using HangOut.Domain.Paginate;
 using HangOut.Domain.Payload.Base;
 using HangOut.Domain.Payload.Request.Business;
+using HangOut.Domain.Payload.Response;
+using HangOut.Domain.Payload.Response.Business;
 using HangOut.Domain.Persistence;
 using HangOut.Repository.Interface;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using StackExchange.Redis.Maintenance;
 
@@ -328,6 +332,202 @@ namespace HangOut.API.Services.Implement
 
         }
 
+        public async Task<ApiResponse<Paginate<GetAllBusinessResponse>>> GetAllBusinessResponse(Guid? accountId, int pageNumber, int pageSize, string? category, string? province)
+        {
+            Expression<Func<Business, bool>> predicate = null;
 
+            if (!string.IsNullOrEmpty(category))
+            {
+                predicate = x => x.Category.Name.Contains(category);
+            }
+
+            if (!string.IsNullOrEmpty(province))
+            {
+                predicate = x => x.Province.Contains(province);
+            }
+
+            var getBusiness = await _unitOfWork.GetRepository<Business>().GetPagingListAsync(
+                 predicate: predicate,
+                 include: x => x.Include(x => x.Category).Include(x => x.Events),
+                 page: pageNumber,
+                 size: pageSize
+                );
+
+            var mapItem = getBusiness.Items.Select(x => new GetAllBusinessResponse
+            {
+               Id = x.Id,
+               BusinessName = x.Name,
+               MainImage = x.MainImageUrl,
+               StartDay = x.StartDay,
+               EndDay = x.EndDay,
+               OpeningHours = x.OpeningHours,
+               Addresss = x.Address,
+               Latidue = x.Latitude,
+               Longtidue = x.Longitude,
+               Province = x.Province,
+               CategoryName = x.Category.Name,
+               EventsOfBusiness = x.Events.Select(e => new EventsOfBusinessResponse
+               {
+                   EventId = e.Id,
+                   Name = e.Name,
+                   MainImage = e.MainImageUrl
+               }).ToList()
+               
+            }).ToList();
+
+            if (accountId != Guid.Empty)
+            {
+                var getFavoriteCategory = await _unitOfWork.GetRepository<UserFavoriteCategories>().GetListAsync(
+                    predicate: x => x.User.AccountId == accountId,
+                    include: i => i.Include(x => x.Category));
+
+                var favoriteCategory = getFavoriteCategory.ToList().Select(x => x.Category.Name).ToHashSet();
+
+                mapItem = mapItem.OrderByDescending(x => favoriteCategory.Contains(x.CategoryName)).ToList();
+
+                var pagedResponse = new Paginate<GetAllBusinessResponse>
+                {
+                    Items = mapItem,
+                    Page = pageNumber,
+                    Size = pageSize,
+                    Total = getBusiness.Total,
+                    TotalPages = (int)Math.Ceiling((double)getBusiness.Total / pageSize)
+                };
+
+                return new ApiResponse<Paginate<GetAllBusinessResponse>>
+                {
+                    Status = 200,
+                    Message = "Get business success",
+                    Data = pagedResponse
+                };
+            }
+
+            var normalPagedResponse = new Paginate<GetAllBusinessResponse>
+            {
+                Items = mapItem,
+                Page = pageNumber,
+                Size = pageSize,
+                Total = getBusiness.Total,
+                TotalPages = (int)Math.Ceiling(((double)getBusiness.Total / pageSize))
+            };
+
+            return new ApiResponse<Paginate<GetAllBusinessResponse>>
+            {
+                Status = 200,
+                Message = "Get business success",
+                Data = normalPagedResponse
+            };
+        }
+
+        public async Task<ApiResponse<string>> DeleteBusiness(Guid businessId)
+        {
+            await _unitOfWork.BeginTransactionAsync();
+            try
+            {
+                var checkDelete = await _unitOfWork.GetRepository<Business>().SingleOrDefaultAsync(predicate: x => x.Id == businessId,
+                    include: i => i.Include(x => x.Events)
+                    );
+
+                if (checkDelete == null)
+                {
+                    return new ApiResponse<string>
+                    {
+                        Status = 404,
+                        Message = "Business not found",
+                        Data = null
+                    };
+                }
+
+                checkDelete.Active = false;
+                foreach (var eventOfBusiness in checkDelete.Events.ToList())
+                {
+                    eventOfBusiness.Active = false;
+                    _unitOfWork.GetRepository<Event>().UpdateAsync(eventOfBusiness);
+                }
+                await _unitOfWork.CommitAsync();
+                await _unitOfWork.CommitTransactionAsync();
+
+                return new ApiResponse<string>
+                {
+                    Status = 200,
+                    Message = "Delete business success",
+                    Data = null
+                };
+
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        Task<ApiResponse<Paginate<Domain.Payload.Response.Business.GetAllBusinessResponse>>> IBusinessService.GetAllBusinessResponse(Guid? accountId, int pageNumber, int pageSize, string? category, string? province)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<ApiResponse<Domain.Payload.Response.Business.GetBusinessDetailResponse>> GetBusinessDetail(Guid businessId)
+        {
+            var getBusiness = await _unitOfWork.GetRepository<Business>().SingleOrDefaultAsync(
+                predicate: x => x.Id == businessId,
+                include: i => i.Include(x => x.Category).Include(i => i.Images.Where(x => x.ObjectId == businessId)).Include(i => i.Events));
+            if (getBusiness == null)
+            {
+                return new ApiResponse<GetBusinessDetailResponse>
+                {
+                    Status= 404,
+                    Message = "Business not found",
+                    Data = null
+                };
+            }
+            var mapItem = new GetBusinessDetailResponse
+            {
+                BusinessId = getBusiness.Id,
+                Name = getBusiness.Name,
+                Active = getBusiness.Active,
+                Vibe = getBusiness.Vibe,
+                Latitude = getBusiness.Latitude,
+                Longitude = getBusiness.Longitude,
+                Address = getBusiness.Address,
+                Province = getBusiness.Province,
+                Description = getBusiness.Description,
+                MainImageUrl = getBusiness.MainImageUrl,
+                OpeningHours = getBusiness.OpeningHours,
+                StartDay = getBusiness.StartDay,
+                EndDay = getBusiness.EndDay,
+                TotalLike = getBusiness.TotalLike,
+                Category = getBusiness.Category.Name,
+                Images = getBusiness.Images.Select(c => new Domain.Payload.Response.Image.ImagesResponse
+                {
+                    ImageId = c .Id,
+                    Url = c.Url,
+                    EntityType = c.EntityType,
+                    ImageType = c.ImageType
+                }).ToList(),
+
+                Events = getBusiness.Events.Select(e => new EventsResponse
+                {
+                    EventId = e.Id,
+                    Name  = e.Name,
+                    StartDate = e.StartDate,
+                    DueDate = e.DueDate,
+                    Active = e.Active,
+                    Description = e.Description,
+                    Latitude = e.Latitude,
+                    Longitude = e.Longitude,
+                    Location = e.Location,
+                    MainImageUrl = e.MainImageUrl
+
+                }).ToList()
+            };
+
+            return new ApiResponse<GetBusinessDetailResponse>
+            {
+                Status = 200,
+                Message = "Get business success",
+                Data = mapItem
+            };
+        }
     }
 }

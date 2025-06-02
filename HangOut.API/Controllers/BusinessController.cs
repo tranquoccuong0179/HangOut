@@ -60,5 +60,36 @@ namespace HangOut.API.Controllers
                 return StatusCode(500, ex.ToString());
             }
         }
+
+        [HttpGet("get-business")]
+        public async Task<IActionResult> GetBusiness([FromQuery]int pageNumber, [FromQuery]int pageSize, [FromQuery]string? category, [FromQuery]string? province)
+        {
+            Guid? accountId = UserUtil.GetAccountId(HttpContext);
+            var response = await _businessService.GetAllBusinessResponse(accountId, pageNumber, pageSize, category,province);
+            return StatusCode(response.Status, response);
+        }
+
+        [HttpDelete("delete-business/{businessId}")]
+        [Authorize(Roles = "BusinessOwner")]
+        public async Task<IActionResult> DeleteBusiness(Guid businessId)
+        {
+            try
+            {
+                var response = await _businessService.DeleteBusiness(businessId);
+                return StatusCode(response.Status, response);
+            }
+            catch (Exception ex) { 
+                
+                _looger.Error("[Delete Business API] " + ex.Message ,ex.StackTrace);
+                return StatusCode(500, ex.ToString());
+            }
+        }
+
+        [HttpGet("get-business-detail")]
+        public async Task<IActionResult> GetBusinessDetail([FromQuery] Guid businessId)
+        {
+            var response = await _businessService.GetBusinessDetail(businessId);
+            return StatusCode(response.Status, response);
+        }
     }
 }
