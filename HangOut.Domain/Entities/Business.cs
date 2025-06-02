@@ -23,7 +23,7 @@ public class Business : EntityAuditBase<Guid>
     
     public virtual Account Account { get; set; }
     public virtual Category Category { get; set; }
-    public virtual ICollection<Image>? Images { get; set; } = new List<Image>();
+    public virtual ICollection<BusinessImage>? BusinessImages { get; set; } = new List<BusinessImage>();
     public virtual ICollection<PlanItem> PlanItems { get; set; } = new List<PlanItem>();
     public virtual ICollection<Voucher> Vouchers { get; set; } = new List<Voucher>();
     public virtual ICollection<Event> Events { get; set; } = new List<Event>();

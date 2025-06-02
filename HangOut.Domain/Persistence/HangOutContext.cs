@@ -17,7 +17,8 @@ public class HangOutContext : DbContext
     public DbSet<Booking> Booking { get; set; }
     public DbSet<Business> Business { get; set; }
     public DbSet<Event> Event { get; set; }
-    public DbSet<Image> Image { get; set; }
+    public DbSet<BusinessImage> BusinessImage { get; set; }
+    public DbSet<EventImage> EventImage { get; set; }
     public DbSet<Plan> Plan { get; set; }
     public DbSet<PlanItem> PlanItem { get; set; }
     public DbSet<Review> Review { get; set; }

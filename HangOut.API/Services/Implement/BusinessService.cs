@@ -165,21 +165,17 @@ namespace HangOut.API.Services.Implement
                 {
                     foreach(var image in request.Image)
                     {
-                        var newImage = new Image
+                        var newImage = new BusinessImage()
                         {
                             Id= Guid.NewGuid(),
                             Url = await _uploadService.UploadImageAsync(image),
-                            CreatedDate= DateTime.Now,
-                            ObjectId = createBusiness.Id,
-                            ImageType = Domain.Enums.EImageType.Business_Image,
                             LastModifiedDate = null,
-                            EntityType = Domain.Enums.EntityTypeEnum.Business
+                            BusinessId = createBusiness.Id
                         };
 
-                        await _unitOfWork.GetRepository<Image>().InsertAsync(newImage);
-                        Console.WriteLine($"Adding Image: ObjectId={newImage.ObjectId}, EntityType={newImage.EntityType}");
+                        await _unitOfWork.GetRepository<BusinessImage>().InsertAsync(newImage);
+                        Console.WriteLine($"Adding Image: BusinessId={newImage.BusinessId}");
                     }
-
                 }
 
                 await _unitOfWork.CommitAsync();
@@ -294,19 +290,15 @@ namespace HangOut.API.Services.Implement
                 {
                     foreach (var image in request.Image)
                     {
-                        var newImage = new Image
+                        var newImage = new BusinessImage()
                         {
                             Id = Guid.NewGuid(),
                             Url = await _uploadService.UploadImageAsync(image),
-                            CreatedDate = DateTime.Now,
-                            ObjectId = createBusiness.Id,
-                            ImageType = Domain.Enums.EImageType.Business_Image,
-                            LastModifiedDate = null,
-                            EntityType = Domain.Enums.EntityTypeEnum.Business
+                            BusinessId = createBusiness.Id
                         };
 
-                        await _unitOfWork.GetRepository<Image>().InsertAsync(newImage);
-                        Console.WriteLine($"Adding Image: ObjectId={newImage.ObjectId}, EntityType={newImage.EntityType}");
+                        await _unitOfWork.GetRepository<BusinessImage>().InsertAsync(newImage);
+                        Console.WriteLine($"Adding Image: BusinessId={newImage.BusinessId}");
                     }
 
                 }
@@ -468,7 +460,10 @@ namespace HangOut.API.Services.Implement
         {
             var getBusiness = await _unitOfWork.GetRepository<Business>().SingleOrDefaultAsync(
                 predicate: x => x.Id == businessId,
-                include: i => i.Include(x => x.Category).Include(i => i.Images.Where(x => x.ObjectId == businessId)).Include(i => i.Events));
+                include: i => i.Include(x => x.Category)
+                    .Include(i => i.BusinessImages!
+                        .Where(x => x.BusinessId == businessId))
+                    .Include(i => i.Events));
             if (getBusiness == null)
             {
                 return new ApiResponse<GetBusinessDetailResponse>
@@ -495,12 +490,10 @@ namespace HangOut.API.Services.Implement
                 EndDay = getBusiness.EndDay,
                 TotalLike = getBusiness.TotalLike,
                 Category = getBusiness.Category.Name,
-                Images = getBusiness.Images.Select(c => new Domain.Payload.Response.Image.ImagesResponse
+                Images = getBusiness.BusinessImages.Select(c => new Domain.Payload.Response.Image.ImagesResponse
                 {
                     ImageId = c .Id,
                     Url = c.Url,
-                    EntityType = c.EntityType,
-                    ImageType = c.ImageType
                 }).ToList(),
 
                 Events = getBusiness.Events.Select(e => new EventsResponse
