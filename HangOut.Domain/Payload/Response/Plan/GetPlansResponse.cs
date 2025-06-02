@@ -7,4 +7,5 @@ public class GetPlansResponse
     public string Location { get; set; }
     public DateTime CreatedDate { get; set; }
     public DateTime? LastModifiedDate { get; set; }
+    public List<GetPlanItemsResponse> PlanItems { get; set; } = new();
 }

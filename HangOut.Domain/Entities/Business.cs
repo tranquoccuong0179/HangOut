@@ -15,8 +15,8 @@ public class Business : EntityAuditBase<Guid>
     public string? Description { get; set; }
     public string? MainImageUrl { get; set; }
     public string? OpeningHours { get; set; }
-    public DayOfWeekEnum? StartDay { get; set; }
-    public DayOfWeekEnum? EndDay { get; set; }
+    public DayOfWeek? StartDay { get; set; }
+    public DayOfWeek? EndDay { get; set; }
     public int TotalLike { get; set; }
     public Guid AccountId { get; set; }
     public Guid CategoryId { get; set; }
