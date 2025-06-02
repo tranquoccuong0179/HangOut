@@ -22,4 +22,12 @@ public class GetBusinessPlanItemsResponse
     public DayOfWeek? EndDay { get; set; }
     public DateTime CreatedDate { get; set; }
     public DateTime? LastModifiedDate { get; set; }
+    public GetCategoryForPlanItemsResponse Category { get; set; } = new();
+}
+
+public class GetCategoryForPlanItemsResponse()
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string? Image { get; set; }
 }

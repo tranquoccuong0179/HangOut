@@ -131,11 +131,11 @@ public class PlanService : BaseService<PlanService>, IPlanService
                 Location = x.Location,
                 CreatedDate = x.CreatedDate,
                 LastModifiedDate = x.LastModifiedDate,
-                PlanItems = x.PlanItems.Select(pi => new GetPlanItemsResponse()
+                PlanItems = x.PlanItems.Select(pi => new GetPlanItemsForPlanResponse()
                 {
                     Id = pi.Id,
                     Time = pi.Time,
-                    Business = new GetBusinessPlanItemsResponse()
+                    Business = new GetBusinessPlanItemsForPlanResponse()
                     {
                         Id = pi.Business.Id,
                         Name = pi.Business.Name,
@@ -151,13 +151,13 @@ public class PlanService : BaseService<PlanService>, IPlanService
                         EndDay = pi.Business.EndDay,
                         CreatedDate = pi.Business.CreatedDate,
                         LastModifiedDate = pi.Business.LastModifiedDate
-                    }
-                }).ToList()
+                    } 
+                }).OrderBy(x => x.Time).ToList()
             },
             predicate: x => x.UserId == user.Id,
             page: page,
             size: size,
-            sortBy: sortBy,
+            sortBy: sortBy ?? nameof(Plan.CreatedDate),
             isAsc: isAsc
         );
         return new ApiResponse<IPaginate<GetPlansResponse>>()
@@ -199,13 +199,19 @@ public class PlanService : BaseService<PlanService>, IPlanService
                     StartDay = x.Business.StartDay,
                     EndDay = x.Business.EndDay,
                     CreatedDate = x.Business.CreatedDate,
-                    LastModifiedDate = x.Business.LastModifiedDate
+                    LastModifiedDate = x.Business.LastModifiedDate,
+                    Category = new GetCategoryForPlanItemsResponse()
+                    {
+                        Id = x.Business.Category.Id,
+                        Name = x.Business.Category.Name,
+                        Image = x.Business.Category.Image
+                    }
                 }
             },
             predicate: x => x.PlanId == planId && x.Plan.UserId == user.Id,
             page: page,
             size: size,
-            sortBy: sortBy,
+            sortBy: sortBy ?? "Time",
             isAsc: isAsc
         );
         return new ApiResponse<IPaginate<GetPlanItemsResponse>>()
