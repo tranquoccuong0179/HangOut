@@ -130,7 +130,29 @@ public class PlanService : BaseService<PlanService>, IPlanService
                 Name = x.Name,
                 Location = x.Location,
                 CreatedDate = x.CreatedDate,
-                LastModifiedDate = x.LastModifiedDate
+                LastModifiedDate = x.LastModifiedDate,
+                PlanItems = x.PlanItems.Select(pi => new GetPlanItemsResponse()
+                {
+                    Id = pi.Id,
+                    Time = pi.Time,
+                    Business = new GetBusinessPlanItemsResponse()
+                    {
+                        Id = pi.Business.Id,
+                        Name = pi.Business.Name,
+                        Vibe = pi.Business.Vibe,
+                        Latitude = pi.Business.Latitude,
+                        Longitude = pi.Business.Longitude,
+                        Address = pi.Business.Address,
+                        Province = pi.Business.Province,
+                        Description = pi.Business.Description,
+                        MainImageUrl = pi.Business.MainImageUrl,
+                        OpeningHours = pi.Business.OpeningHours,
+                        StartDay = pi.Business.StartDay,
+                        EndDay = pi.Business.EndDay,
+                        CreatedDate = pi.Business.CreatedDate,
+                        LastModifiedDate = pi.Business.LastModifiedDate
+                    }
+                }).ToList()
             },
             predicate: x => x.UserId == user.Id,
             page: page,

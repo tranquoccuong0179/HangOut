@@ -26,8 +26,8 @@ namespace HangOut.Domain.Payload.Request.Business
 
         public IFormFile? MainImage { get; set; }
         public string? OpeningHours {  get; set; }
-        public DayOfWeekEnum? StartDay { get; set; }
-        public DayOfWeekEnum? EndDay { get;set; }
+        public DayOfWeek? StartDay { get; set; }
+        public DayOfWeek? EndDay { get;set; }
         public Guid? CategoryId { get; set; }
     }
 }
