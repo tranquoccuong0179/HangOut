@@ -11,7 +11,5 @@ namespace HangOut.Domain.Payload.Response.Image
     {
         public Guid ImageId { get; set; }
         public string Url { get; set; }
-        public EImageType ImageType { get; set; }
-        public EntityTypeEnum EntityType { get; set; }
     }
 }

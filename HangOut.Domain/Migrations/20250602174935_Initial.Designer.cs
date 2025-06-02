@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HangOut.Domain.Migrations
 {
     [DbContext(typeof(HangOutContext))]
-    [Migration("20250602171956_Initial")]
+    [Migration("20250602174935_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -202,6 +202,32 @@ namespace HangOut.Domain.Migrations
                     b.ToTable("Business");
                 });
 
+            modelBuilder.Entity("HangOut.Domain.Entities.BusinessImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BusinessId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LastModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BusinessId");
+
+                    b.ToTable("BusinessImage");
+                });
+
             modelBuilder.Entity("HangOut.Domain.Entities.Category", b =>
                 {
                     b.Property<Guid>("Id")
@@ -286,7 +312,7 @@ namespace HangOut.Domain.Migrations
                     b.ToTable("Event");
                 });
 
-            modelBuilder.Entity("HangOut.Domain.Entities.Image", b =>
+            modelBuilder.Entity("HangOut.Domain.Entities.EventImage", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -295,19 +321,11 @@ namespace HangOut.Domain.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("EntityType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ImageType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("LastModifiedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid>("ObjectId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Url")
                         .IsRequired()
@@ -315,9 +333,9 @@ namespace HangOut.Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ObjectId");
+                    b.HasIndex("EventId");
 
-                    b.ToTable("Image");
+                    b.ToTable("EventImage");
                 });
 
             modelBuilder.Entity("HangOut.Domain.Entities.MyFavourite", b =>
@@ -473,19 +491,13 @@ namespace HangOut.Domain.Migrations
 
             modelBuilder.Entity("HangOut.Domain.Entities.UserFavoriteCategories", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
+                    b.HasKey("CategoryId", "UserId");
 
                     b.HasIndex("UserId");
 
@@ -591,6 +603,17 @@ namespace HangOut.Domain.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("HangOut.Domain.Entities.BusinessImage", b =>
+                {
+                    b.HasOne("HangOut.Domain.Entities.Business", "Business")
+                        .WithMany("BusinessImages")
+                        .HasForeignKey("BusinessId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Business");
+                });
+
             modelBuilder.Entity("HangOut.Domain.Entities.Event", b =>
                 {
                     b.HasOne("HangOut.Domain.Entities.Business", "Business")
@@ -602,21 +625,15 @@ namespace HangOut.Domain.Migrations
                     b.Navigation("Business");
                 });
 
-            modelBuilder.Entity("HangOut.Domain.Entities.Image", b =>
+            modelBuilder.Entity("HangOut.Domain.Entities.EventImage", b =>
                 {
-                    b.HasOne("HangOut.Domain.Entities.Business", null)
-                        .WithMany("Images")
-                        .HasForeignKey("ObjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_Image_Business_ObjectId");
+                    b.HasOne("HangOut.Domain.Entities.Event", "Event")
+                        .WithMany("EventImages")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.HasOne("HangOut.Domain.Entities.Event", null)
-                        .WithMany("Images")
-                        .HasForeignKey("ObjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_Image_Event_ObjectId");
+                    b.Navigation("Event");
                 });
 
             modelBuilder.Entity("HangOut.Domain.Entities.MyFavourite", b =>
@@ -743,9 +760,9 @@ namespace HangOut.Domain.Migrations
                 {
                     b.Navigation("Bookings");
 
-                    b.Navigation("Events");
+                    b.Navigation("BusinessImages");
 
-                    b.Navigation("Images");
+                    b.Navigation("Events");
 
                     b.Navigation("MyFavourites");
 
@@ -765,7 +782,7 @@ namespace HangOut.Domain.Migrations
 
             modelBuilder.Entity("HangOut.Domain.Entities.Event", b =>
                 {
-                    b.Navigation("Images");
+                    b.Navigation("EventImages");
                 });
 
             modelBuilder.Entity("HangOut.Domain.Entities.Plan", b =>

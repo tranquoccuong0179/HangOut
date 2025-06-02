@@ -134,13 +134,12 @@ namespace HangOut.Domain.Migrations
                 name: "UserFavoriteCategories",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserFavoriteCategories", x => x.Id);
+                    table.PrimaryKey("PK_UserFavoriteCategories", x => new { x.CategoryId, x.UserId });
                     table.ForeignKey(
                         name: "FK_UserFavoriteCategories_Category_CategoryId",
                         column: x => x.CategoryId,
@@ -183,6 +182,27 @@ namespace HangOut.Domain.Migrations
                         name: "FK_Booking_User_UserId",
                         column: x => x.UserId,
                         principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BusinessImage",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BusinessId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BusinessImage", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BusinessImage_Business_BusinessId",
+                        column: x => x.BusinessId,
+                        principalTable: "Business",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -324,32 +344,24 @@ namespace HangOut.Domain.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Image",
+                name: "EventImage",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ImageType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ObjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    EntityType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EventId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Image", x => x.Id);
+                    table.PrimaryKey("PK_EventImage", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Image_Business_ObjectId",
-                        column: x => x.ObjectId,
-                        principalTable: "Business",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Image_Event_ObjectId",
-                        column: x => x.ObjectId,
+                        name: "FK_EventImage_Event_EventId",
+                        column: x => x.EventId,
                         principalTable: "Event",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -403,14 +415,19 @@ namespace HangOut.Domain.Migrations
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_BusinessImage_BusinessId",
+                table: "BusinessImage",
+                column: "BusinessId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Event_BusinessId",
                 table: "Event",
                 column: "BusinessId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Image_ObjectId",
-                table: "Image",
-                column: "ObjectId");
+                name: "IX_EventImage_EventId",
+                table: "EventImage",
+                column: "EventId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MyFavourite_AccountId",
@@ -453,11 +470,6 @@ namespace HangOut.Domain.Migrations
                 column: "AccountId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserFavoriteCategories_CategoryId",
-                table: "UserFavoriteCategories",
-                column: "CategoryId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_UserFavoriteCategories_UserId",
                 table: "UserFavoriteCategories",
                 column: "UserId");
@@ -478,7 +490,10 @@ namespace HangOut.Domain.Migrations
                 name: "Booking");
 
             migrationBuilder.DropTable(
-                name: "Image");
+                name: "BusinessImage");
+
+            migrationBuilder.DropTable(
+                name: "EventImage");
 
             migrationBuilder.DropTable(
                 name: "MyFavourite");
