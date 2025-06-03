@@ -46,4 +46,10 @@ public static class ApiEndPointConstant
         public const string CategoryEndpoint = ApiEndpoint + "/categories";
         public const string CategoryWithId = CategoryEndpoint + "/{id}";
     }
+
+    public static class Event
+    {
+        public const string EventEndPoint = ApiEndpoint + "/events";
+        public const string CreateEvent = EventEndPoint;
+    }
 }
