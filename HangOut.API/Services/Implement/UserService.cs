@@ -33,6 +33,8 @@ public class UserService : BaseService<UserService>, IUserService
                 CreatedDate = x.CreatedDate,
                 LastModifiedDate = x.LastModifiedDate
             },
+            predicate: x => x.Active == true && x.Account.Active == true,
+            include: x => x.Include(x => x.Account),
             page: page,
             size: size,
             sortBy: sortBy,
@@ -49,7 +51,7 @@ public class UserService : BaseService<UserService>, IUserService
     public async Task<ApiResponse> DeleteUserAsync(Guid userId)
     {
         var user = await _unitOfWork.GetRepository<User>().SingleOrDefaultAsync(
-            predicate: x => x.Id.Equals(userId),
+            predicate: x => x.Id.Equals(userId) && x.Active == true && x.Account.Active == true,
             include: x => x.Include(x => x.Account)
         );
         if (user == null)
@@ -72,7 +74,7 @@ public class UserService : BaseService<UserService>, IUserService
         if (accountId == Guid.Empty)
             throw new BadHttpRequestException("Không tìm thấy thông tin người dùng");
         var user = await _unitOfWork.GetRepository<User>().SingleOrDefaultAsync(
-            predicate: x => x.AccountId.Equals(accountId),
+            predicate: x => x.AccountId.Equals(accountId) && x.Active == true && x.Account.Active == true,
             include: x => x.Include(x => x.Account)
         );
         if (user == null) 
@@ -99,7 +101,7 @@ public class UserService : BaseService<UserService>, IUserService
     public async Task<ApiResponse> UpdateUserProfileAsync(Guid? accountId, UpdateProfileRequest request)
     {
         var user = await _unitOfWork.GetRepository<User>().SingleOrDefaultAsync(
-            predicate: x => x.AccountId.Equals(accountId),
+            predicate: x => x.AccountId.Equals(accountId) && x.Active == true && x.Account.Active == true,
             include: x => x.Include(x => x.Account)
         );
         if (user == null)
@@ -146,7 +148,8 @@ public class UserService : BaseService<UserService>, IUserService
                 CreatedDate = x.CreatedDate,
                 LastModifiedDate = x.LastModifiedDate
             },
-            predicate: x => x.Id.Equals(userId)
+            predicate: x => x.Id.Equals(userId) && x.Active == true && x.Account.Active == true,
+            include: x => x.Include(x => x.Account)
         );
         if (user == null)
             throw new NotFoundException("Không tìm thấy thông tin người dùng");
