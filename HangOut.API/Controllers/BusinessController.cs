@@ -72,7 +72,7 @@ namespace HangOut.API.Controllers
         }
 
         [HttpDelete("delete-business/{businessId}")]
-        [Authorize(Roles = "BusinessOwner")]
+        [Authorize(Roles = "BusinessOwner, Admin")]
         public async Task<IActionResult> DeleteBusiness(Guid businessId)
         {
             try
