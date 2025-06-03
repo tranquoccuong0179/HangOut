@@ -26,7 +26,11 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     }
 
     #region Get
-    
+
+    public virtual async Task<IQueryable<T>> GetQueryable()
+    {
+        return _dbSet.AsQueryable();
+    }
 
     public virtual async Task<T> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate = null,
         Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,

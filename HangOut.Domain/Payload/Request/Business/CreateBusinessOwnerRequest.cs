@@ -32,10 +32,6 @@ namespace HangOut.Domain.Payload.Request.Business
 
         [Required(ErrorMessage = "Name is required")]
         public string BusinessName { get; set; }
-
-        [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
-        public bool Active { get; set; } = true;
-
         public string? Vibe { get; set; }
 
         [MaxLength(100)]
@@ -61,7 +57,6 @@ namespace HangOut.Domain.Payload.Request.Business
 
         public DayOfWeek? StartDay {  get; set; }
         public DayOfWeek? EndDay {  get; set; }
-        public int TotalLike {  get; set; }
         public List<IFormFile>? Image { get; set; }
         public Guid CategoryId { get; set; }
     }

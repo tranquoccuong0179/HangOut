@@ -152,13 +152,11 @@ namespace HangOut.API.Services.Implement
                     OpeningHours = request.OpenningHours,
                     StartDay = request.StartDay,
                     EndDay = request.EndDay,
-                    TotalLike = request.TotalLike,
                     CategoryId = request.CategoryId,
                     CreatedDate = DateTime.Now,
                     LastModifiedDate = null
                 };
            
-
                 await _unitOfWork.GetRepository<Business>().InsertAsync(createBusiness);
 
                 if (request.Image != null)
@@ -277,7 +275,6 @@ namespace HangOut.API.Services.Implement
                     OpeningHours = request.OpenningHours,
                     StartDay = request.StartDay,
                     EndDay = request.EndDay,
-                    TotalLike = request.TotalLike,
                     CategoryId = request.CategoryId,
                     CreatedDate = DateTime.Now,
                     LastModifiedDate = null
@@ -324,7 +321,8 @@ namespace HangOut.API.Services.Implement
 
         }
 
-        public async Task<ApiResponse<Paginate<GetAllBusinessResponse>>> GetAllBusinessResponse(Guid? accountId, int pageNumber, int pageSize, string? category, string? province)
+        public async Task<ApiResponse<Paginate<BusinessListWithHotResponse>>> GetAllBusinessResponse(
+            Guid? accountId, int pageNumber, int pageSize, string? category, string? province, string? businessName)
         {
             Expression<Func<Business, bool>> predicate = null;
 
@@ -337,35 +335,75 @@ namespace HangOut.API.Services.Implement
             {
                 predicate = x => x.Province.Contains(province);
             }
+           if(!string.IsNullOrEmpty(province) && !string.IsNullOrEmpty(category))
+            {
+                predicate = r => r.Category.Name.Contains(category) && r.Province.Contains(province);
+            }
+
+            if (!string.IsNullOrEmpty(businessName))
+            {
+                predicate = x => x.Name.Contains(businessName);
+            }
+
 
             var getBusiness = await _unitOfWork.GetRepository<Business>().GetPagingListAsync(
                  predicate: predicate,
                  include: x => x.Include(x => x.Category).Include(x => x.Events),
                  page: pageNumber,
                  size: pageSize
-                );
+            );
 
-            var mapItem = getBusiness.Items.Select(x => new GetAllBusinessResponse
+            var businesses = getBusiness.Items.Select(x => new GetAllBusinessResponse
             {
-               Id = x.Id,
-               BusinessName = x.Name,
-               MainImage = x.MainImageUrl,
-               StartDay = x.StartDay,
-               EndDay = x.EndDay,
-               OpeningHours = x.OpeningHours,
-               Addresss = x.Address,
-               Latidue = x.Latitude,
-               Longtidue = x.Longitude,
-               Province = x.Province,
-               CategoryName = x.Category.Name,
-               EventsOfBusiness = x.Events.Select(e => new EventsOfBusinessResponse
-               {
-                   EventId = e.Id,
-                   Name = e.Name,
-                   MainImage = e.MainImageUrl
-               }).ToList()
-               
+                Id = x.Id,
+                BusinessName = x.Name,
+                MainImage = x.MainImageUrl,
+                StartDay = x.StartDay,
+                EndDay = x.EndDay,
+                OpeningHours = x.OpeningHours,
+                Addresss = x.Address,
+                Latidue = x.Latitude,
+                Longtidue = x.Longitude,
+                Province = x.Province,
+                CategoryName = x.Category.Name,
+                TotalLike = x.TotalLike,
+                EventsOfBusiness = x.Events.Select(e => new EventsOfBusinessResponse
+                {
+                    EventId = e.Id,
+                    Name = e.Name,
+                    MainImage = e.MainImageUrl
+                }).ToList(),
+
             }).ToList();
+
+            var allBusinesses = await _unitOfWork.GetRepository<Business>().GetListAsync(
+                predicate: null,
+                include: x => x.Include(x => x.Category).Include(x => x.Events));
+
+            var hotBusinesses = allBusinesses
+                .OrderByDescending(x => x.TotalLike)
+                .Take(5)
+                .Select(x => new GetAllBusinessResponse
+                {
+                    Id = x.Id,
+                    BusinessName = x.Name,
+                    MainImage = x.MainImageUrl,
+                    StartDay = x.StartDay,
+                    EndDay = x.EndDay,
+                    OpeningHours = x.OpeningHours,
+                    Addresss = x.Address,
+                    Latidue = x.Latitude,
+                    Longtidue = x.Longitude,
+                    Province = x.Province,
+                    CategoryName = x.Category.Name,
+                    TotalLike = x.TotalLike,
+                    EventsOfBusiness = x.Events.Select(e => new EventsOfBusinessResponse
+                    {
+                        EventId = e.Id,
+                        Name = e.Name,
+                        MainImage = e.MainImageUrl
+                    }).ToList(),
+                }).ToList();
 
             if (accountId != Guid.Empty)
             {
@@ -373,43 +411,34 @@ namespace HangOut.API.Services.Implement
                     predicate: x => x.User.AccountId == accountId,
                     include: i => i.Include(x => x.Category));
 
-                var favoriteCategory = getFavoriteCategory.ToList().Select(x => x.Category.Name).ToHashSet();
+                var favoriteCategory = getFavoriteCategory.Select(x => x.Category.Name).ToHashSet();
 
-                mapItem = mapItem.OrderByDescending(x => favoriteCategory.Contains(x.CategoryName)).ToList();
-
-                var pagedResponse = new Paginate<GetAllBusinessResponse>
-                {
-                    Items = mapItem,
-                    Page = pageNumber,
-                    Size = pageSize,
-                    Total = getBusiness.Total,
-                    TotalPages = (int)Math.Ceiling((double)getBusiness.Total / pageSize)
-                };
-
-                return new ApiResponse<Paginate<GetAllBusinessResponse>>
-                {
-                    Status = 200,
-                    Message = "Get business success",
-                    Data = pagedResponse
-                };
+                businesses = businesses.OrderByDescending(x => favoriteCategory.Contains(x.CategoryName)).ToList();
             }
 
-            var normalPagedResponse = new Paginate<GetAllBusinessResponse>
+            var responseData = new BusinessListWithHotResponse
             {
-                Items = mapItem,
+                Businesses = businesses,
+                HotBusinesses = hotBusinesses
+            };
+
+            var pagedResponse = new Paginate<BusinessListWithHotResponse>
+            {
+                Items = new List<BusinessListWithHotResponse> { responseData },
                 Page = pageNumber,
                 Size = pageSize,
                 Total = getBusiness.Total,
-                TotalPages = (int)Math.Ceiling(((double)getBusiness.Total / pageSize))
+                TotalPages = (int)Math.Ceiling((double)getBusiness.Total / pageSize)
             };
 
-            return new ApiResponse<Paginate<GetAllBusinessResponse>>
+            return new ApiResponse<Paginate<BusinessListWithHotResponse>>
             {
                 Status = 200,
                 Message = "Get business success",
-                Data = normalPagedResponse
+                Data = pagedResponse
             };
         }
+
 
         public async Task<ApiResponse<string>> DeleteBusiness(Guid businessId)
         {
@@ -453,9 +482,6 @@ namespace HangOut.API.Services.Implement
                 throw new Exception(ex.ToString());
             }
         }
-
-
-
         public async Task<ApiResponse<Domain.Payload.Response.Business.GetBusinessDetailResponse>> GetBusinessDetail(Guid businessId)
         {
             var getBusiness = await _unitOfWork.GetRepository<Business>().SingleOrDefaultAsync(
@@ -518,6 +544,37 @@ namespace HangOut.API.Services.Implement
                 Message = "Get business success",
                 Data = mapItem
             };
+        }
+
+        public async Task<ApiResponse<string>> ActiveBusiness(Guid businessId)
+        {
+            try
+            {
+                var getBusiness = await _unitOfWork.GetRepository<Business>().SingleOrDefaultAsync(predicate: x => x.Id == businessId && x.Active == false);
+                if (getBusiness == null) {
+
+                    return new ApiResponse<string>
+                    {
+                        Status = 404,
+                        Message = "Business not found",
+                        Data = null
+                    };
+                }
+
+                getBusiness.Active = true;
+                _unitOfWork.GetRepository<Business>().UpdateAsync(getBusiness);
+                await _unitOfWork.CommitAsync();
+                return new ApiResponse<string>
+                {
+                    Status = 200,
+                    Message = "Active business success",
+                    Data = null
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception();
+            }
         }
     }
 }
