@@ -26,8 +26,9 @@ namespace HangOut.Domain.Payload.Response.Business
 
         public string CategoryName { get; set; }
 
+        public int TotalLike {  get; set; }
         public List<EventsOfBusinessResponse> EventsOfBusiness { get; set; } = new List<EventsOfBusinessResponse>();
-    }
+    }   
 
     public class EventsOfBusinessResponse
     {

@@ -53,6 +53,7 @@ public interface IGenericRepository<T> : IDisposable where T : class
         bool isAsc = true
     );
 
+    Task<IQueryable<T>> GetQueryable();
     #endregion
 
     #region Insert

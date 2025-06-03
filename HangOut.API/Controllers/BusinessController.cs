@@ -3,6 +3,7 @@ using HangOut.API.Services.Interface;
 using HangOut.Domain.Payload.Request.Business;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Tsp;
 
 namespace HangOut.API.Controllers
 {
@@ -62,10 +63,11 @@ namespace HangOut.API.Controllers
         }
 
         [HttpGet("get-business")]
-        public async Task<IActionResult> GetBusiness([FromQuery]int pageNumber, [FromQuery]int pageSize, [FromQuery]string? category, [FromQuery]string? province)
+        public async Task<IActionResult> GetBusiness([FromQuery]int pageNumber, [FromQuery]int pageSize, [FromQuery]string? category,
+            [FromQuery]string? province, [FromQuery] string? businessName)
         {
             Guid? accountId = UserUtil.GetAccountId(HttpContext);
-            var response = await _businessService.GetAllBusinessResponse(accountId, pageNumber, pageSize, category,province);
+            var response = await _businessService.GetAllBusinessResponse(accountId, pageNumber, pageSize, category,province, businessName);
             return StatusCode(response.Status, response);
         }
 
@@ -90,6 +92,22 @@ namespace HangOut.API.Controllers
         {
             var response = await _businessService.GetBusinessDetail(businessId);
             return StatusCode(response.Status, response);
+        }
+
+        [HttpPut("active-business/{businessId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ActiveBusiness(Guid businessId)
+        {
+            try
+            {
+                var response = await _businessService.ActiveBusiness(businessId);
+                return StatusCode(response.Status, response);
+            }
+            catch (Exception ex) { 
+            
+                _looger.Error("[Active Business API]" + ex.Message ,ex.StackTrace);
+                return StatusCode(500, ex.ToString());
+            }
         }
     }
 }
