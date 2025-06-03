@@ -27,6 +27,7 @@ public static class ServiceExtensions
         services.AddScoped<IPlanService, PlanService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IEventService, EventService>();
         
         return services;
     }
