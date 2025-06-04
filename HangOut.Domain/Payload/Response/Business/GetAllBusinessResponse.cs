@@ -16,7 +16,7 @@ namespace HangOut.Domain.Payload.Response.Business
 
         public string OpeningHours { get; set; }
 
-        public string Addresss { get; set; }
+        public string Address { get; set; }
 
         public string Province { get; set; }
 
