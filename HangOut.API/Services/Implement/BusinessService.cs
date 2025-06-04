@@ -465,6 +465,7 @@ namespace HangOut.API.Services.Implement
                     eventOfBusiness.Active = false;
                     _unitOfWork.GetRepository<Event>().UpdateAsync(eventOfBusiness);
                 }
+                _unitOfWork.GetRepository<Business>().UpdateAsync(checkDelete);
                 await _unitOfWork.CommitAsync();
                 await _unitOfWork.CommitTransactionAsync();
 
