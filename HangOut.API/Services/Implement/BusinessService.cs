@@ -122,17 +122,17 @@ namespace HangOut.API.Services.Implement
 
                 await _unitOfWork.GetRepository<Account>().InsertAsync(creaNewAccount);
 
-                var newUser = new User
-                {
-                    Name = request.Name,
-                    Active = creaNewAccount.Active,
-                    Avatar = await _uploadService.UploadImageAsync(request.AvatarImage),
-                    AccountId = creaNewAccount.Id,
-                    CreatedDate = creaNewAccount.CreatedDate,
-                    LastModifiedDate = creaNewAccount.LastModifiedDate    
-                };
+                //var newUser = new User
+                //{
+                //    Name = request.Name,
+                //    Active = creaNewAccount.Active,
+                //    Avatar = await _uploadService.UploadImageAsync(request.AvatarImage),
+                //    AccountId = creaNewAccount.Id,
+                //    CreatedDate = creaNewAccount.CreatedDate,
+                //    LastModifiedDate = creaNewAccount.LastModifiedDate    
+                //};
 
-                await _unitOfWork.GetRepository<User>().InsertAsync(newUser);
+                //await _unitOfWork.GetRepository<User>().InsertAsync(newUser);
 
                 var createBusiness = new Business
                 {
@@ -244,18 +244,18 @@ namespace HangOut.API.Services.Implement
 
                 await _unitOfWork.GetRepository<Account>().InsertAsync(creaNewAccount);
 
-                var newUser = new User
-                {
-                    Name = request.Name,
-                    Active = creaNewAccount.Active,
-                    Avatar = await _uploadService.UploadImageAsync(request.AvatarImage),
-                    AccountId = creaNewAccount.Id,
-                    CreatedDate = creaNewAccount.CreatedDate,
-                    LastModifiedDate = creaNewAccount.LastModifiedDate,
+                //var newUser = new User
+                //{
+                //    Name = request.Name,
+                //    Active = creaNewAccount.Active,
+                //    Avatar = await _uploadService.UploadImageAsync(request.AvatarImage),
+                //    AccountId = creaNewAccount.Id,
+                //    CreatedDate = creaNewAccount.CreatedDate,
+                //    LastModifiedDate = creaNewAccount.LastModifiedDate,
                     
-                };
+                //};
 
-                await _unitOfWork.GetRepository<User>().InsertAsync(newUser);
+                //await _unitOfWork.GetRepository<User>().InsertAsync(newUser);
 
                 var createBusiness = new Business
                 {
@@ -265,7 +265,7 @@ namespace HangOut.API.Services.Implement
                     Longitude = request.Longitude,
                     Address = request.Address,
                     Province = request.Province,
-                    Name = request.Name,
+                    Name = request.BusinessName,
                     Description = request.Description,
                     AccountId = creaNewAccount.Id,
                     Active = false,
