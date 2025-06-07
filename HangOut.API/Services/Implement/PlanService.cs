@@ -41,7 +41,8 @@ public class PlanService : BaseService<PlanService>, IPlanService
             foreach (var plans in request.PlanItems)
             {
                 var business = await _unitOfWork.GetRepository<Business>().SingleOrDefaultAsync(
-                    predicate: x => x.Id == plans.BusinessId && x.Province == request.Location
+                    predicate: x => x.Id == plans.BusinessId
+                                    // && x.Province == request.Location
                 );
                 if (business == null)
                     throw new BadHttpRequestException($"Không tìm thấy doanh nghiệp với ID {plans.BusinessId}");
@@ -91,7 +92,8 @@ public class PlanService : BaseService<PlanService>, IPlanService
         if (plan == null)
             throw new NotFoundException("Kế hoạch không tồn tại");
         var business = await _unitOfWork.GetRepository<Business>().SingleOrDefaultAsync(
-            predicate: x => x.Id == request.BusinessId && x.Province == plan.Location
+            predicate: x => x.Id == request.BusinessId
+                            // && x.Province == plan.Location
         );
         if (business == null)
             throw new NotFoundException($"Không tìm thấy doanh nghiệp với ID {request.BusinessId}");
@@ -342,7 +344,8 @@ public class PlanService : BaseService<PlanService>, IPlanService
         if (request.BusinessId != null)
         {
             var business = await _unitOfWork.GetRepository<Business>().SingleOrDefaultAsync(
-                predicate: x => x.Id == request.BusinessId && x.Province == planItem.Plan.Location
+                predicate: x => x.Id == request.BusinessId 
+                                // && x.Province == planItem.Plan.Location
             );
             if (business == null)
                 throw new NotFoundException($"Không tìm thấy doanh nghiệp với ID {request.BusinessId}");
