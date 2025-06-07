@@ -130,7 +130,7 @@ namespace HangOut.API.Services.Implement
                     Longitude = request.Longitude,
                     Address = request.Address,
                     Province = request.Province,
-                    Name = request.Name,
+                    Name = request.BusinessName,
                     Description = request.Description,
                     AccountId = creaNewAccount.Id,
                     Active = true,
@@ -231,7 +231,6 @@ namespace HangOut.API.Services.Implement
                 };
 
                 await _unitOfWork.GetRepository<Account>().InsertAsync(creaNewAccount);
-
                 var createBusiness = new Business
                 {
                     Id = Guid.NewGuid(),
@@ -240,7 +239,7 @@ namespace HangOut.API.Services.Implement
                     Longitude = request.Longitude,
                     Address = request.Address,
                     Province = request.Province,
-                    Name = request.Name,
+                    Name = request.BusinessName,
                     Description = request.Description,
                     AccountId = creaNewAccount.Id,
                     Active = false,
@@ -299,25 +298,25 @@ namespace HangOut.API.Services.Implement
         public async Task<ApiResponse<Paginate<BusinessListWithHotResponse>>> GetAllBusinessResponse(
             Guid? accountId, int pageNumber, int pageSize, string? category, string? province, string? businessName)
         {
-            Expression<Func<Business, bool>> predicate = null;
+            Expression<Func<Business, bool>> predicate = x => x.Active == true;
 
             if (!string.IsNullOrEmpty(category))
             {
-                predicate = x => x.Category.Name.Contains(category);
+                predicate = x => x.Category.Name.Contains(category) && x.Active == true;
             }
 
             if (!string.IsNullOrEmpty(province))
             {
-                predicate = x => x.Province.Contains(province);
+                predicate = x => x.Province.Contains(province) && x.Active == true;
             }
            if(!string.IsNullOrEmpty(province) && !string.IsNullOrEmpty(category))
             {
-                predicate = r => r.Category.Name.Contains(category) && r.Province.Contains(province);
+                predicate = r => r.Category.Name.Contains(category) && r.Province.Contains(province) && r.Active == true;
             }
 
             if (!string.IsNullOrEmpty(businessName))
             {
-                predicate = x => x.Name.Contains(businessName);
+                predicate = x => x.Name.Contains(businessName) && x.Active == true;
             }
 
 
@@ -352,7 +351,7 @@ namespace HangOut.API.Services.Implement
             }).ToList();
 
             var allBusinesses = await _unitOfWork.GetRepository<Business>().GetListAsync(
-                predicate: null,
+                predicate: x => x.Active == true,
                 include: x => x.Include(x => x.Category).Include(x => x.Events));
 
             var hotBusinesses = allBusinesses
@@ -440,6 +439,7 @@ namespace HangOut.API.Services.Implement
                     eventOfBusiness.Active = false;
                     _unitOfWork.GetRepository<Event>().UpdateAsync(eventOfBusiness);
                 }
+
                 _unitOfWork.GetRepository<Business>().UpdateAsync(checkDelete);
                 await _unitOfWork.CommitAsync();
                 await _unitOfWork.CommitTransactionAsync();

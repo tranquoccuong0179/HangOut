@@ -24,10 +24,11 @@ namespace HangOut.Domain.Payload.Request.Business
         [Required]
         [Compare(nameof(Password), ErrorMessage = "Mật khẩu xác nhận không khớp.")]
         public string ConfirmPassword { get; set; } = string.Empty;
-        [Required]
-        [StringLength(maximumLength: 100, MinimumLength = 1, ErrorMessage = "Tên phải có độ dài từ 1 đến 100 ký tự.")]
-        public string Name { get; set; } = string.Empty;
-        public IFormFile? AvatarImage { get; set; } = null!;
+
+        //[Required]
+        //[StringLength(maximumLength: 100, MinimumLength = 1, ErrorMessage = "Tên phải có độ dài từ 1 đến 100 ký tự.")]
+        //public string Name { get; set; } = string.Empty;
+        //public IFormFile? AvatarImage { get; set; } = null!;
 
         [Required]
         [StringLength(maximumLength: 4, MinimumLength = 4, ErrorMessage = "Mã OTP phải có độ dài chính xác 4 ký tự.")]

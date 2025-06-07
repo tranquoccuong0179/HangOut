@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using HangOut.API.Common.Extensions;
 using HangOut.API.Common.Middlewares;
 using HangOut.Domain;
@@ -7,6 +7,8 @@ using HangOut.Domain.Constants;
 using HangOut.Domain.Persistence;
 using HangOut.Repository;
 using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.Discord;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog(SerilogConfig.Configure);
@@ -37,7 +39,18 @@ try
     builder.Services.AddConfigSwagger();
     builder.Services.AddHttpContextAccessor();
 
+    //Serilog Config Discord
+    var discordHook = builder.Configuration["Discord:WebHook"];
+    builder.Services.AddSerilog();
+    builder.Host.UseSerilog();
+
+
+    Log.Logger = new LoggerConfiguration()
+        .MinimumLevel.Debug().WriteTo.Console().WriteTo.Discord(webhookId: 1379814633094778941, webhookToken: "2fAXC3MSL_GZ3PMOcH6ZGJoKC84iEUqhUNrJXz7Wdo1USeMbdCVFdEIsryDQGxnFW1oT",
+        restrictedToMinimumLevel: LogEventLevel.Error).CreateLogger();
+
     var app = builder.Build();
+
 
     if (app.Environment.IsDevelopment() || app.Environment.IsProduction() || app.Environment.IsStaging())
     {
@@ -62,6 +75,13 @@ try
             throw; 
         }
     }
+    app.UseSerilogRequestLogging();
+    app.MapGet("/test-discord-error", () =>
+    {
+        Log.Error("Đây là lỗi thử nghiệm gửi về Discord");
+        throw new Exception("Đây là Exception test gửi về Discord");
+    });
+
     app.UseMiddleware<GlobalException>();
     app.UseCors(CorsConstant.PolicyName);
     app.UseHttpsRedirection();
