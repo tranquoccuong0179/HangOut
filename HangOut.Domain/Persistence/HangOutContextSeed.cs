@@ -60,6 +60,83 @@ public class HangOutContextSeed
                 }
             );
         }
+        //
+        // await _context.Category.AddAsync(
+        //     new Category()
+        //     {
+        //         Id = Guid.Parse("01972d30-1c9e-7573-ba21-a0c3bd97a75c"),
+        //         Name = "Food",
+        //         Image = "https://example.com/images/food.jpg",
+        //         CreatedDate = DateTime.UtcNow,
+        //         LastModifiedDate = DateTime.UtcNow
+        //     }
+        // );
+        // await _context.Account.AddAsync(
+        //     new Account()
+        //     {
+        //         Id = Guid.Parse("01972d32-e150-77d1-8433-b44b8dc5cd81"),
+        //         Phone = "0987654321",
+        //         Email = "ta@gmail.com",
+        //         Role = ERoleEnum.BusinessOwner,
+        //         CreatedDate = DateTime.UtcNow,
+        //         Active = true,
+        //         Password = HashPassword("123456"),
+        //         LastModifiedDate = DateTime.UtcNow,
+        //     }
+        // );
+        // await _context.Business.AddAsync(
+        //     new Business()
+        //     {
+        //         Id = Guid.Parse("01972d34-02d4-75be-b78c-48371af61813"),
+        //         AccountId = Guid.Parse("01972d32-e150-77d1-8433-b44b8dc5cd81"),
+        //         CreatedDate = DateTime.UtcNow,
+        //         LastModifiedDate = DateTime.UtcNow,
+        //         Name = "Tasty Treats",
+        //         Description = "A delightful place for food lovers.",
+        //         Address = "123 Food Street, Flavor Town",
+        //         CategoryId = Guid.Parse("01972d30-1c9e-7573-ba21-a0c3bd97a75c"),
+        //         Active = true,
+        //         Latitude = "12.345678",
+        //         Longitude = "98.765432",
+        //         MainImageUrl = "https://example.com/images/tasty_treats.jpg",
+        //         Province = "HCM",
+        //         EndDay = DayOfWeek.Friday,
+        //         StartDay = DayOfWeek.Monday,
+        //         TotalLike = 2,
+        //     }
+        // );
+        // await _context.Plan.AddAsync(
+        //     new Plan()
+        //     {
+        //         Id = Guid.Parse("01972d36-1c9e-7573-ba21-a0c3bd97a75c"),
+        //         Name = "Weekend Foodie Plan",
+        //         Location = "HCM",
+        //         CreatedDate = DateTime.UtcNow,
+        //         LastModifiedDate = DateTime.UtcNow,
+        //         UserId = Guid.Parse("13290747-C401-4550-B57D-BAC55B4FE2B5"),
+        //         PlanItems = new List<PlanItem>()
+        //         {
+        //             new PlanItem()
+        //             {
+        //                 Id = Guid.Parse("01972d38-02d4-75be-b78c-48371af61813"),
+        //                 Time = TimeOnly.FromDateTime(DateTime.UtcNow),
+        //                 BusinessId = Guid.Parse("01972d34-02d4-75be-b78c-48371af61813"),
+        //             },
+        //             new PlanItem()
+        //             {
+        //                 Id = Guid.Parse("01972d3a-1c9e-7573-ba21-a0c3bd97a75c"),
+        //                 Time = TimeOnly.FromDateTime(DateTime.UtcNow.AddHours(2)),
+        //                 BusinessId = Guid.Parse("01972d34-02d4-75be-b78c-48371af61813"),
+        //             },
+        //             new PlanItem()
+        //             {
+        //                 Id = Guid.Parse("01972d3c-02d4-75be-b78c-48371af61813"),
+        //                 Time = TimeOnly.FromDateTime(DateTime.UtcNow.AddHours(4)),
+        //                 BusinessId = Guid.Parse("01972d34-02d4-75be-b78c-48371af61813"),
+        //             }
+        //         }
+        //     }
+        // );
     }
     private string HashPassword(string password)
     {

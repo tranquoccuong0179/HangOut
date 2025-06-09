@@ -20,9 +20,9 @@ namespace HangOut.Domain.Payload.Response.Business
 
         public string Province { get; set; }
 
-        public string Latidue { get; set; }
+        public string Latitude { get; set; }
 
-        public string Longtidue { get; set; }
+        public string Longitude { get; set; }
 
         public string CategoryName { get; set; }
 
