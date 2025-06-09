@@ -52,4 +52,9 @@ public static class ApiEndPointConstant
         public const string EventEndPoint = ApiEndpoint + "/events";
         public const string CreateEvent = EventEndPoint;
     }
+
+    public static class Review
+    {
+        public const string ReviewEndpoint = ApiEndpoint + "/reviews";
+    }
 }

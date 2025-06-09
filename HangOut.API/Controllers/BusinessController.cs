@@ -1,19 +1,23 @@
 ﻿using HangOut.API.Common.Utils;
 using HangOut.API.Services.Interface;
+using HangOut.Domain.Payload.Base;
 using HangOut.Domain.Payload.Request.Business;
+using HangOut.Domain.Payload.Response.Review;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OrbitMap.Domain.Paginate.Interfaces;
 using Org.BouncyCastle.Tsp;
 
 namespace HangOut.API.Controllers
 {
     [ApiController]
     [Route("api/v1/business")]
-    public class BusinessController(ILogger _looger, IBusinessService _businessService) : Controller
+    public class BusinessController(ILogger _looger, IBusinessService _businessService, IReviewService _reviewService)
+        : Controller
     {
         [HttpPost("create-business-owner")]
         //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateBusiness([FromForm]CreateBusinessOwnerRequest request)
+        public async Task<IActionResult> CreateBusiness([FromForm] CreateBusinessOwnerRequest request)
         {
             try
             {
@@ -43,31 +47,34 @@ namespace HangOut.API.Controllers
             catch (Exception ex)
             {
                 _looger.Error("[Register Business Owner]" + ex.Message, ex.StackTrace);
-                return StatusCode(500,ex.ToString());
+                return StatusCode(500, ex.ToString());
             }
         }
 
         [HttpPatch("edit-business/{businessId}")]
-        public async  Task<IActionResult>EditBusiness(Guid businessId, [FromForm]EditBusinessRequest request)
+        public async Task<IActionResult> EditBusiness(Guid businessId, [FromForm] EditBusinessRequest request)
         {
             try
             {
                 var response = await _businessService.EditBusiness(businessId, request);
                 return StatusCode(response.Status, response);
 
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
-                _looger.Error("[Edit Business API] " + ex.Message,ex.StackTrace);
+                _looger.Error("[Edit Business API] " + ex.Message, ex.StackTrace);
                 return StatusCode(500, ex.ToString());
             }
         }
 
         [HttpGet("get-business")]
-        public async Task<IActionResult> GetBusiness([FromQuery]int pageNumber, [FromQuery]int pageSize, [FromQuery]string? category,
-            [FromQuery]string? province, [FromQuery] string? businessName)
+        public async Task<IActionResult> GetBusiness([FromQuery] int pageNumber, [FromQuery] int pageSize,
+            [FromQuery] string? category,
+            [FromQuery] string? province, [FromQuery] string? businessName)
         {
             Guid? accountId = UserUtil.GetAccountId(HttpContext);
-            var response = await _businessService.GetAllBusinessResponse(accountId, pageNumber, pageSize, category,province, businessName);
+            var response = await _businessService.GetAllBusinessResponse(accountId, pageNumber, pageSize, category,
+                province, businessName);
             return StatusCode(response.Status, response);
         }
 
@@ -80,9 +87,10 @@ namespace HangOut.API.Controllers
                 var response = await _businessService.DeleteBusiness(businessId);
                 return StatusCode(response.Status, response);
             }
-            catch (Exception ex) { 
-                
-                _looger.Error("[Delete Business API] " + ex.Message ,ex.StackTrace);
+            catch (Exception ex)
+            {
+
+                _looger.Error("[Delete Business API] " + ex.Message, ex.StackTrace);
                 return StatusCode(500, ex.ToString());
             }
         }
@@ -103,11 +111,34 @@ namespace HangOut.API.Controllers
                 var response = await _businessService.ActiveBusiness(businessId);
                 return StatusCode(response.Status, response);
             }
-            catch (Exception ex) { 
-            
-                _looger.Error("[Active Business API]" + ex.Message ,ex.StackTrace);
+            catch (Exception ex)
+            {
+
+                _looger.Error("[Active Business API]" + ex.Message, ex.StackTrace);
                 return StatusCode(500, ex.ToString());
             }
         }
+
+        [HttpGet("/{id}/reviews")]
+        [ProducesResponseType(typeof(ApiResponse<IPaginate<GetReviewResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetReviewsByBusinessId([FromRoute] Guid id, [FromQuery] int page = 1,
+            [FromQuery] int size = 30,
+            [FromQuery] string? sortBy = null, [FromQuery] bool isAsc = true)
+        {
+            try
+            {
+                var accountId = UserUtil.GetAccountId(HttpContext);
+                var response = await _reviewService.GetReviewsByBusinessIdAsync(id, page, size, sortBy, isAsc);
+                return StatusCode(response.Status, response);
+            }
+            catch (Exception ex)
+            {
+                _looger.Error("[Get Reviews By Business Id API] " + ex.Message, ex.StackTrace);
+                return StatusCode(500, ex.ToString());
+            }
+        }
+
     }
 }
