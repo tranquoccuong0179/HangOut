@@ -155,5 +155,24 @@ namespace HangOut.API.Controllers
             var response = await _businessService.GetBusinessByOwner(accountId!.Value, pageNumber, pageSize);
             return StatusCode(response.Status, response);
         }
+
+        [HttpPost("like-dislike-business")]
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> LikeOrDisLikeBusiness([FromBody]LikeBusinessRequest request)
+        {
+            var accountId = UserUtil.GetAccountId(HttpContext);
+            var response = await _businessService.FavoriteBusiness(accountId!.Value,request.BusinessId);
+            return StatusCode(response.Status, response);
+        }
+
+        [HttpGet("get-favorite-business")]
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> GetFavoriteBusiness([FromQuery]int pageNumber, [FromQuery]int pageSize, [FromQuery]string? categoryName)
+        {
+            var accountId = UserUtil.GetAccountId(HttpContext);
+            var response = await _businessService.GetBusinessFavorite(accountId!.Value, pageNumber, pageSize,categoryName);
+            return StatusCode(response.Status, response);
+        }
+
     }
 }

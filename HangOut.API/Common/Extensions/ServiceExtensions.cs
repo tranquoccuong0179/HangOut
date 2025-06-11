@@ -29,6 +29,7 @@ public static class ServiceExtensions
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IEventService, EventService>();
         services.AddScoped<IReviewService, ReviewService>();
+        services.AddScoped<IBookingService, BookingService>();
         
         return services;
     }

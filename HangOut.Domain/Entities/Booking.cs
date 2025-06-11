@@ -4,7 +4,6 @@ namespace HangOut.Domain.Entities;
 
 public class Booking : EntityAuditBase<Guid>
 {
-    public decimal Price { get; set; }
     public DateTime Date { get; set; }
     public bool Active { get; set; }
     public DateTime? CancelAt { get; set; }

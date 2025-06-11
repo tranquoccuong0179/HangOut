@@ -10,8 +10,7 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
     {
         builder.HasKey(b => b.Id);
 
-        builder.Property(b => b.Price)
-            .IsRequired();
+
         
         builder.Property(b => b.Date)
             .IsRequired();
