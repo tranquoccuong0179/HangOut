@@ -119,7 +119,7 @@ namespace HangOut.API.Controllers
             }
         }
 
-        [HttpGet("/{id}/reviews")]
+        [HttpGet("{id}/reviews")]
         [ProducesResponseType(typeof(ApiResponse<IPaginate<GetReviewResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
