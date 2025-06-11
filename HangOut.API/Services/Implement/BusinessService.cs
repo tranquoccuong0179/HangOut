@@ -552,5 +552,77 @@ namespace HangOut.API.Services.Implement
                 throw new Exception();
             }
         }
+
+        public async Task<ApiResponse<GetBusinessAccount>> GetBusinessAccount(Guid businessId)
+        {
+            var getAccountByBusiness = await _unitOfWork.GetRepository<Business>().SingleOrDefaultAsync(
+                predicate: x => x.Id == businessId,
+                include: i => i.Include(x => x.Account)
+                );
+
+            var mapItemp = new GetBusinessAccount
+            {
+                Id = getAccountByBusiness.Account.Id,
+                Email = getAccountByBusiness.Account.Email,
+                Phone = getAccountByBusiness.Account.Phone,
+                CreatedDate = getAccountByBusiness.Account.CreatedDate,
+                LastModifiedDate = getAccountByBusiness.Account.LastModifiedDate
+            };
+
+            return new ApiResponse<GetBusinessAccount>
+            {
+                Status = 200,
+                Message = "Get business account success",
+                Data = mapItemp
+            };
+        }
+
+        public async Task<ApiResponse<Paginate<GetAllBusinessResponse>>> GetBusinessByOwner(Guid accountId, int pageNumber, int pageSize)
+        {
+            var getBusiness = await _unitOfWork.GetRepository<Business>().GetPagingListAsync(
+                predicate: x => x.AccountId == accountId,
+                include: i => i.Include(x => x.Category).Include(x => x.Events),
+                page: pageNumber,
+                size: pageSize
+            );
+
+            var mapItem = getBusiness.Items.Select(x => new GetAllBusinessResponse
+            {
+                Id = x.Id,
+                BusinessName = x.Name,
+                MainImage = x.MainImageUrl,
+                StartDay = x.StartDay,
+                EndDay = x.EndDay,
+                OpeningHours = x.OpeningHours,
+                Address = x.Address,
+                Latitude = x.Latitude,
+                Longitude = x.Longitude,
+                Province = x.Province,
+                CategoryName = x.Category.Name,
+                TotalLike = x.TotalLike,
+                EventsOfBusiness = x.Events.Select(e => new EventsOfBusinessResponse
+                {
+                    EventId = e.Id,
+                    Name = e.Name,
+                    MainImage = e.MainImageUrl
+                }).ToList(),
+            }).ToList();
+
+            var pagedResponse = new Paginate<GetAllBusinessResponse>
+            {
+                Items = mapItem,
+                Page = pageNumber,
+                Size = pageSize,
+                Total = getBusiness.Total,
+                TotalPages = (int)Math.Ceiling((double)getBusiness.Total / pageSize)
+            };
+
+            return new ApiResponse<Paginate<GetAllBusinessResponse>>
+            {
+                Status = 200,
+                Message = "Get business by owner success",
+                Data = pagedResponse
+            };
+        }
     }
 }

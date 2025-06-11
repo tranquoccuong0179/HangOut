@@ -16,6 +16,8 @@ namespace HangOut.API.Services.Interface
         Task<ApiResponse<string>> DeleteBusiness(Guid businessId);
         Task<ApiResponse<GetBusinessDetailResponse>> GetBusinessDetail(Guid businessId);
         Task<ApiResponse<string>> ActiveBusiness(Guid businessId);
+        Task<ApiResponse<GetBusinessAccount>> GetBusinessAccount(Guid businessIds);
+        Task<ApiResponse<Paginate<GetAllBusinessResponse>>> GetBusinessByOwner(Guid accountId,int pageNumber, int pageSize);
 
     }
 }
