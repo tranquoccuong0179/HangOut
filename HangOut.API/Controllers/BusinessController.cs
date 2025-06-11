@@ -121,7 +121,7 @@ namespace HangOut.API.Controllers
 
         [HttpGet("/{id}/reviews")]
         [ProducesResponseType(typeof(ApiResponse<IPaginate<GetReviewResponse>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetReviewsByBusinessId([FromRoute] Guid id, [FromQuery] int page = 1,
             [FromQuery] int size = 30,
@@ -140,5 +140,20 @@ namespace HangOut.API.Controllers
             }
         }
 
+        [HttpGet("get-account-by-business")]
+        public async Task<IActionResult> GetBusinessAccount([FromQuery] Guid businessId)
+        {
+                var response = await _businessService.GetBusinessAccount(businessId);
+                return StatusCode(response.Status, response);
+        }
+
+        [HttpGet("get-business-by-owner")]
+        [Authorize(Roles = "BusinessOwner")]
+        public async Task<IActionResult> GetBusinessByOwner([FromQuery]int pageNumber, [FromQuery]int pageSize)
+        {
+            var accountId = UserUtil.GetAccountId(HttpContext);
+            var response = await _businessService.GetBusinessByOwner(accountId!.Value, pageNumber, pageSize);
+            return StatusCode(response.Status, response);
+        }
     }
 }
