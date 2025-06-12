@@ -46,7 +46,7 @@ try
 
 
     Log.Logger = new LoggerConfiguration()
-        .MinimumLevel.Debug().WriteTo.Console().WriteTo.Discord(webhookId: 1379814633094778941, webhookToken: "2fAXC3MSL_GZ3PMOcH6ZGJoKC84iEUqhUNrJXz7Wdo1USeMbdCVFdEIsryDQGxnFW1oT",
+        .MinimumLevel.Debug().WriteTo.Console().WriteTo.Discord(webhookId: 1382218240230559876, webhookToken: "vpXN_mjEA6zqd5VFkUD67WvaAlD3dQWXGpqBE7SyyhkPMFoJSpf4KXss1BiQCv7kNAoF",
         restrictedToMinimumLevel: LogEventLevel.Error).CreateLogger();
 
     var app = builder.Build();

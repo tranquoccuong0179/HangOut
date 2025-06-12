@@ -18,6 +18,8 @@ namespace HangOut.API.Services.Interface
         Task<ApiResponse<string>> ActiveBusiness(Guid businessId);
         Task<ApiResponse<GetBusinessAccount>> GetBusinessAccount(Guid businessIds);
         Task<ApiResponse<Paginate<GetAllBusinessResponse>>> GetBusinessByOwner(Guid accountId,int pageNumber, int pageSize);
+        Task<ApiResponse<Paginate<GetAllBusinessResponse>>> GetBusinessFavorite(Guid accountId, int pageNumber, int pageSize, string? categoryName);
+        Task<ApiResponse<string>> FavoriteBusiness(Guid accountId,Guid businessId);
 
     }
 }

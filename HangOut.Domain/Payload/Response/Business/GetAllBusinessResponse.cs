@@ -25,11 +25,17 @@ namespace HangOut.Domain.Payload.Response.Business
         public string Longitude { get; set; }
 
         public string CategoryName { get; set; }
-
+        public string CategoryIcon {  get; set; }
         public int TotalLike {  get; set; }
         public List<EventsOfBusinessResponse> EventsOfBusiness { get; set; } = new List<EventsOfBusinessResponse>();
-    }   
+        public List<UserFavoriteBusiness> userFavorite { get; set; } = new List<UserFavoriteBusiness>();
+    }
 
+    public class UserFavoriteBusiness
+    {
+        public Guid AccountId { get; set; }
+        public Guid BusinessId { get; set; }
+    }
     public class EventsOfBusinessResponse
     {
         public Guid EventId { get; set; }

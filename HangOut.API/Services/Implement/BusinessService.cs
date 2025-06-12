@@ -322,7 +322,7 @@ namespace HangOut.API.Services.Implement
 
             var getBusiness = await _unitOfWork.GetRepository<Business>().GetPagingListAsync(
                  predicate: predicate,
-                 include: x => x.Include(x => x.Category).Include(x => x.Events),
+                 include: x => x.Include(x => x.Category).Include(x => x.Events).Include(u => u.MyFavourites),
                  page: pageNumber,
                  size: pageSize
             );
@@ -339,6 +339,7 @@ namespace HangOut.API.Services.Implement
                 Latitude = x.Latitude,
                 Longitude = x.Longitude,
                 Province = x.Province,
+                CategoryIcon = x.Category.Image,
                 CategoryName = x.Category.Name,
                 TotalLike = x.TotalLike,
                 EventsOfBusiness = x.Events.Select(e => new EventsOfBusinessResponse
@@ -347,7 +348,13 @@ namespace HangOut.API.Services.Implement
                     Name = e.Name,
                     MainImage = e.MainImageUrl
                 }).ToList(),
+                userFavorite = x.MyFavourites.Select(f => new UserFavoriteBusiness
+                {
+                    AccountId = f.AccountId,
+                    BusinessId = f.BusinessId
 
+                }).ToList()
+             
             }).ToList();
 
             var allBusinesses = await _unitOfWork.GetRepository<Business>().GetListAsync(
@@ -369,6 +376,7 @@ namespace HangOut.API.Services.Implement
                     Latitude = x.Latitude,
                     Longitude = x.Longitude,
                     Province = x.Province,
+                    CategoryIcon = x.Category.Image,
                     CategoryName = x.Category.Name,
                     TotalLike = x.TotalLike,
                     EventsOfBusiness = x.Events.Select(e => new EventsOfBusinessResponse
@@ -377,6 +385,12 @@ namespace HangOut.API.Services.Implement
                         Name = e.Name,
                         MainImage = e.MainImageUrl
                     }).ToList(),
+                    userFavorite = x.MyFavourites.Select(f => new UserFavoriteBusiness
+                    {
+                        AccountId = f.AccountId,
+                        BusinessId = f.BusinessId
+
+                    }).ToList()
                 }).ToList();
 
             if (accountId != Guid.Empty)
@@ -465,7 +479,7 @@ namespace HangOut.API.Services.Implement
                 include: i => i.Include(x => x.Category)
                     .Include(i => i.BusinessImages!
                         .Where(x => x.BusinessId == businessId))
-                    .Include(i => i.Events));
+                    .Include(i => i.Events).Include(f => f.MyFavourites));
             if (getBusiness == null)
             {
                 return new ApiResponse<GetBusinessDetailResponse>
@@ -491,6 +505,7 @@ namespace HangOut.API.Services.Implement
                 StartDay = getBusiness.StartDay,
                 EndDay = getBusiness.EndDay,
                 TotalLike = getBusiness.TotalLike,
+                CategoryIcon = getBusiness.Category.Image,
                 Category = getBusiness.Category.Name,
                 Images = getBusiness.BusinessImages.Select(c => new Domain.Payload.Response.Image.ImagesResponse
                 {
@@ -510,6 +525,13 @@ namespace HangOut.API.Services.Implement
                     Longitude = e.Longitude,
                     Location = e.Location,
                     MainImageUrl = e.MainImageUrl
+
+                }).ToList(),
+
+                UserFavoriteBusinesses = getBusiness.MyFavourites.Select(f => new UserFavoriteBusiness
+                {
+                    AccountId = f.AccountId,
+                    BusinessId = f.BusinessId
 
                 }).ToList()
             };
@@ -581,7 +603,7 @@ namespace HangOut.API.Services.Implement
         {
             var getBusiness = await _unitOfWork.GetRepository<Business>().GetPagingListAsync(
                 predicate: x => x.AccountId == accountId,
-                include: i => i.Include(x => x.Category).Include(x => x.Events),
+                include: i => i.Include(x => x.Category).Include(x => x.Events).Include(f => f.MyFavourites),
                 page: pageNumber,
                 size: pageSize
             );
@@ -623,6 +645,122 @@ namespace HangOut.API.Services.Implement
                 Message = "Get business by owner success",
                 Data = pagedResponse
             };
+        }
+
+        public async Task<ApiResponse<Paginate<GetAllBusinessResponse>>> GetBusinessFavorite(Guid accountId, int pageNumber, int pageSize,string? categoryName)
+        {
+
+            Expression<Func<MyFavourite, bool>> predicate = x => x.AccountId == accountId;
+
+            if (!string.IsNullOrEmpty(categoryName))
+            {
+                predicate = x => x.AccountId == accountId && x.Business.Category.Name.Contains(categoryName);
+            }
+            var getFavoriteBusiness = await _unitOfWork.GetRepository<MyFavourite>().GetPagingListAsync(
+                predicate: predicate,
+                include: i => i.Include(b => b.Business).ThenInclude(c => c.Category).Include(e => e.Business.Events).Include(c => c.Business.Category),
+                page: pageNumber,
+                size: pageSize
+                );
+
+            var mapItem = getFavoriteBusiness.Items.Select(c => new GetAllBusinessResponse
+            {
+                Id = c.Business.Id,
+                BusinessName = c.Business.Name,
+                MainImage = c.Business.MainImageUrl,
+                Address = c.Business.Address,
+                Province = c.Business.Province,
+                Latitude = c.Business.Latitude,
+                Longitude = c.Business.Longitude,
+                StartDay = c.Business.StartDay,
+                EndDay = c.Business.EndDay,
+                OpeningHours = c.Business.OpeningHours,
+                TotalLike = c.Business.TotalLike,
+                CategoryIcon = c.Business.Category.Image,
+                CategoryName = c.Business.Category.Name,
+                EventsOfBusiness = c.Business.Events.Select(c => new EventsOfBusinessResponse
+                {
+                    EventId = c.Id,
+                    Name = c.Name,
+                    MainImage = c.MainImageUrl,
+                }).ToList(),
+
+                userFavorite = c.Business.MyFavourites.Select(f => new UserFavoriteBusiness
+                {
+                    AccountId = f.AccountId,
+                    BusinessId = f.BusinessId
+
+                }).ToList()
+
+            }).ToList();
+
+            var pagedResponse = new Paginate<GetAllBusinessResponse>
+            {
+                Items = mapItem,
+                Page = pageNumber,
+                Size = pageSize,
+                Total = getFavoriteBusiness.Total,
+                TotalPages = (int)Math.Ceiling((double)getFavoriteBusiness.Total / pageSize)
+            };
+
+            return new ApiResponse<Paginate<GetAllBusinessResponse>>
+            {
+                Status = StatusCodes.Status200OK,
+                Message = "Get favorite business success",
+                Data = pagedResponse
+            };
+        }
+
+        public async Task<ApiResponse<string>> FavoriteBusiness(Guid accountId,Guid businessId)
+        {
+            await _unitOfWork.BeginTransactionAsync();
+            try
+            {
+                var checkFavorite = await _unitOfWork.GetRepository<MyFavourite>().SingleOrDefaultAsync(predicate: x => x.AccountId == accountId && x.BusinessId == businessId);
+                var getBusiness = await _unitOfWork.GetRepository<Business>().SingleOrDefaultAsync(predicate: x => x.Id == businessId);
+                if (checkFavorite != null)
+                {
+                    getBusiness.TotalLike = getBusiness.TotalLike - 1;
+
+                    _unitOfWork.GetRepository<MyFavourite>().DeleteAsync(checkFavorite);
+                    _unitOfWork.GetRepository<Business>().UpdateAsync(getBusiness);
+                    await _unitOfWork.CommitAsync();
+                    await _unitOfWork.CommitTransactionAsync();
+
+                    return new ApiResponse<string>
+                    {
+                        Status = StatusCodes.Status200OK,
+                        Message = "Successfully removed favorites business",
+                        Data = null
+                    };
+                }
+
+                var favoriteBusiness = new MyFavourite
+                {
+                    AccountId = accountId,
+                    BusinessId = businessId
+                };
+
+                getBusiness.TotalLike = getBusiness.TotalLike + 1;
+
+                await _unitOfWork.GetRepository<MyFavourite>().InsertAsync(favoriteBusiness);
+                _unitOfWork.GetRepository<Business>().UpdateAsync(getBusiness);
+
+                await _unitOfWork.CommitAsync();
+                await _unitOfWork.CommitTransactionAsync();
+
+                return new ApiResponse<string>
+                {
+                    Status = StatusCodes.Status200OK,
+                    Message = "Favorite business success",
+                    Data = null
+                };
+            }
+            catch (Exception ex) { 
+            
+                await _unitOfWork.RollbackTransactionAsync();
+                throw new Exception(ex.ToString());
+            }
         }
     }
 }

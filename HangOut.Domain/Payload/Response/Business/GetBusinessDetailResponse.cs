@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,9 +24,12 @@ namespace HangOut.Domain.Payload.Response.Business
         public DayOfWeek? StartDay { get; set; }
         public DayOfWeek? EndDay { get; set; }
         public int TotalLike { get; set; }
+
+        public string CategoryIcon {  get; set; }
         public string Category {  get; set; }
         public List<EventsResponse> Events { get; set; } = new List<EventsResponse>();
         public List<ImagesResponse> Images { get; set; } = new List<ImagesResponse>();
+        public List<UserFavoriteBusiness> UserFavoriteBusinesses { get; set; } = new List<UserFavoriteBusiness>();
 
     }
 }

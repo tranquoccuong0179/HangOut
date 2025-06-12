@@ -13,7 +13,6 @@ namespace HangOut.API.Services.Interface
         Task<ApiResponse<EditVoucherRequest>> EditVoucher(EditVoucherRequest request);
         Task<ApiResponse<string>> ReceiveVoucher(Guid accountId, Guid voucherId);
         Task<ApiResponse<Paginate<GetMyVoucherResponse>>> GetVoucherByAccount(Guid accountId, int pageNumber, int pageSize);
-
         Task<ApiResponse<string>> DeleteVoucher(Guid voucherId);
     }
 }
