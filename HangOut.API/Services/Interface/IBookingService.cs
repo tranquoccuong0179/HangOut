@@ -9,5 +9,6 @@ namespace HangOut.API.Services.Interface
         Task<ApiResponse<string>> Booking(Guid accountId,Guid businessId,DateTime date);
         Task<ApiResponse<Paginate<GetBookingsResponse>>> GetBookings(int pageNumber, int pageSize);
         Task<ApiResponse<GetBooking>> GetBooking(Guid bookingId);
+        Task<ApiResponse<Paginate<GetBookingsResponse>>> GetBookingByUser(Guid userId, int pageNumber, int pageSize);
     }
 }
