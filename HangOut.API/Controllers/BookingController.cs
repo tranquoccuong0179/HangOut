@@ -42,5 +42,14 @@ namespace HangOut.API.Controllers
             var response = await _bookingService.GetBooking(bookingId);
             return StatusCode(response.Status,response);
         }
+
+        [HttpGet("get-bookings-by-user")]
+        [Authorize]
+        public async Task<IActionResult> GetBookingByUser([FromQuery]int pageNumber, [FromQuery]int pageSize)
+        {
+            var accountId = UserUtil.GetAccountId(HttpContext);
+            var response = await _bookingService.GetBookingByUser(accountId!.Value, pageNumber, pageSize);
+            return StatusCode(response.Status,response);
+        }
     }
 }

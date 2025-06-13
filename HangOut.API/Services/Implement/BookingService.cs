@@ -184,5 +184,39 @@ namespace HangOut.API.Services.Implement
             };
 
         }
+
+        public async Task<ApiResponse<Paginate<GetBookingsResponse>>> GetBookingByUser(Guid accountId, int pageNumber, int pageSize)
+        {
+            var getUser = await _unitOfWork.GetRepository<User>().SingleOrDefaultAsync(predicate: x => x.AccountId == accountId);
+            var getBookings = await _unitOfWork.GetRepository<Booking>().GetPagingListAsync(
+                predicate: x => x.UserId == getUser.Id,
+                include: i => i.Include(u => u.User).Include(a => a.User.Account).Include(b => b.Business));
+
+            var mapItem = getBookings.Items.Select( x => new GetBookingsResponse
+            {
+                Id = x.Id,
+                Date = x.Date,
+                CreatedDate = x.CreatedDate,
+                LastModifiedDate = x.LastModifiedDate,
+                UserName = x.User.Name,
+                Phone = x.User.Account.Phone
+            }).ToList();
+
+            var pagedResponse = new Paginate<GetBookingsResponse>
+            {
+                Items = mapItem,
+                Page = pageNumber,
+                Size = pageSize,
+                Total = getBookings.Total,
+                TotalPages = (int)Math.Ceiling((double)getBookings.Total / pageSize)
+            };
+
+            return new ApiResponse<Paginate<GetBookingsResponse>>
+            {
+                Status = StatusCodes.Status200OK,
+                Message = "Get booking by user success",
+                Data = pagedResponse
+            };
+        }
     }
 }
